@@ -61,13 +61,13 @@ F3 - 100 Steps & Stop
 # AssemblerTwo.Lib
 Primarily contains the actual Assembler code, as well as misc support code.
 
-This library can stand alone if you want to embed the assembler in abother project.
+This library can stand alone if you want to embed the assembler in another project.
 
 # AssemblerTwo.Machine
 Contains only the virtual machine and minimal support code.
 
-This library can stand alone if you want to embed the 
+This library can stand alone if you want to embed the virtual machine in another project.
 
 # Misc
 
-- `Documents/Misc/npp_asm2.xml` Notepad++ User Defined Language file for the asm language
+- `Documents/Misc/npp_asm2.xml` Notepad++ User Defined Language file for the asm language.
