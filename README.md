@@ -6,10 +6,11 @@ Hobbyist assembly language, assembler, and virtual machine
 The virtual machine is a 16-bit byte-addressed processor that has:
 
 - 16-bit Program Counter (64k Address Space)
-- 16-bit Registers
 - Registers: `A`, `B`, `C`, `D`, `E`, `F`, `G`, `H`, `I`, `J`, `K`, `L`, `M`, `N`, `P`, `S`. 
-- `S` - Stack Pointer manipulated by `PUSH`, `POP`, `CALL`, `RET` & others
-- No hard-wired accumulator; most instrctions are target/operand type (ie `ADD A,B`)
+  - `A ... N` - General purpose registers 
+  - `P` - General purpose register with conventions
+  - `S` - Stack Pointer register manipulated by `PUSH`, `POP`, `CALL`, `RET` & others
+- No hard-wired accumulator; most instructions are target/operand type (ie `ADD A,B`)
 
 See `/Documents/opcodes.txt` for the complete instruction listing. Please note that the list of opcodes in still in active design/development and can change without notice. Some opcodes in the list have yet to be implemented in code :shipit:
 

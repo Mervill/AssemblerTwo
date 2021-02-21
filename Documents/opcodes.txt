@@ -99,7 +99,7 @@ QUESTIONS:
 0x1 C.AE    r1 r2   i:offst
 0x2 C.EQ    r1 r2   i:offst   Call equal
 0x3 C.NEQ   r1 r2   i:offst   Call not equal
-0x4 R.LT    r1 r2             Return less than`
+0x4 R.LT    r1 r2             Return less than
 0x5 R.LTE   r1 r2             Return less than equal
 0x6 R.GT    r1 r2             Return greater than
 0x7 R.GTE   r1 r2             Return greater than or equal
