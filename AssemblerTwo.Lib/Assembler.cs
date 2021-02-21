@@ -1,0 +1,398 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Globalization;
+
+namespace AssemblerTwo.Lib
+{
+    public static class Assembler
+    {
+        // stream: read in chunks up to next \n or eof
+        // do we even want to care about stream reading / char walking if we want
+        // to do things like error printing? probablly since streams are about
+        // doing the processing inline with the file reading itself rather then waiting
+        // for the whole file to become loaded into memory. we want the whole file in memory anyway
+        // but streams are fancy and we can hold the data in something other then a single string variable
+
+        public static readonly Encoding TxtEncoding = Encoding.ASCII;
+
+        public static byte[] Build(string sourceText)
+        {
+            var strTokens = StringTokenize(sourceText);
+            var lexTokens = Lex(strTokens);
+            var parseResult = Parser.Parse(lexTokens);
+            var byteGroup = GenerateBytecode(parseResult.SyntaxTree);
+            return byteGroup.Bytes;
+        }
+
+        #region String Tokenizer
+
+        /// <summary>
+        /// Turn the given string into a series of tokens
+        /// </summary>
+        /// <param name="sourceText"></param>
+        /// <returns></returns>
+        /// <remarks>
+        /// The string tokenizers job is to get the source file / source text out of the way as quickly as possible.
+        /// It should strike a balance between the granularity of its tokens and the ease of finishing its work
+        /// and passing the token list to the next steps, where operating on groups of symbols will be much easier
+        /// than working with raw text.
+        /// </remarks>
+        public static List<StringTokenInfo> StringTokenize(string sourceText)
+        {
+            if (string.IsNullOrEmpty(sourceText))
+                throw new ArgumentException($"{nameof(sourceText)} must not be null or empty", nameof(sourceText));
+
+            var stringTokens = new List<StringTokenInfo>();
+            var remainingText = sourceText;
+
+            int globalCharacterIndex = 0;
+            int lineCharacterIndex = 0;
+            int lineIndex = 0;
+
+            while (remainingText.Length != 0)
+            {
+                var tokenInfo = FindStringTokenDefinition(remainingText);
+
+                if (tokenInfo.Token == StringToken.Unknown)
+                {
+                    throw new AssemblerException($"Unknown token at ({lineIndex}:{lineCharacterIndex}): `{remainingText[0]}`");
+                }
+
+                tokenInfo.GlobalCharacterIndex = globalCharacterIndex;
+                tokenInfo.LineIndex = lineIndex;
+                tokenInfo.LineCharacterIndex = lineCharacterIndex;
+
+                var tokenLength = tokenInfo.ValueLength;
+
+                globalCharacterIndex += tokenLength;
+                lineCharacterIndex += tokenLength;
+                if (tokenInfo.Token == StringToken.EndOfLine)
+                {
+                    lineIndex++;
+                    lineCharacterIndex = 0;
+                }
+
+                remainingText = remainingText.Substring(tokenLength);
+                stringTokens.Add(tokenInfo);
+            }
+
+            return stringTokens;
+        }
+
+        static StringTokenInfo FindStringTokenDefinition(string remainingText)
+        {
+            foreach (var tokenDef in StringTokenDefinition.Table)
+            {
+                var (Token, Value) = tokenDef.Match(remainingText);
+                if (Token != StringToken.Unknown)
+                {
+                    return new StringTokenInfo(Token, Value);
+                }
+            }
+            return new StringTokenInfo(); // Token.Unknown by default
+        }
+
+        #endregion
+
+        static readonly Dictionary<string, LexicalToken> sSymbolLexicalTokenStrings = new Dictionary<string, LexicalToken>()
+        {
+            ["!"] = LexicalToken.SymExclaim,
+            ["#"] = LexicalToken.SymSharp,
+            ["$"] = LexicalToken.SymDollar,
+            ["%"] = LexicalToken.SymPercent,
+            ["&"] = LexicalToken.SymAmp,
+            ["'"] = LexicalToken.SymQuote,
+            ["("] = LexicalToken.SymLParen,
+            [")"] = LexicalToken.SymRParen,
+            ["*"] = LexicalToken.SymAsterisk,
+            ["+"] = LexicalToken.SymPlus,
+            [","] = LexicalToken.SymComma,
+            ["-"] = LexicalToken.SymMinus,
+            ["."] = LexicalToken.SymPeriod,
+            ["/"] = LexicalToken.SymFwdslash,
+            [":"] = LexicalToken.SymColon,
+            ["<"] = LexicalToken.SymLessThan,
+            ["="] = LexicalToken.SymEquals,
+            [">"] = LexicalToken.SymGrtrThan,
+            ["?"] = LexicalToken.SymQuestMark,
+            ["@"] = LexicalToken.SymAt,
+            ["["] = LexicalToken.SymLSBrack,
+            ["\\"] = LexicalToken.SymBackslash,
+            ["]"] = LexicalToken.SymRSBrack,
+            ["^"] = LexicalToken.SymCaret,
+            ["`"] = LexicalToken.SymBacktick,
+            ["{"] = LexicalToken.SymLCBrack,
+            ["|"] = LexicalToken.SymVertBar,
+            ["}"] = LexicalToken.SymRCBrack,
+            ["~"] = LexicalToken.SymTilde,
+        };
+
+        public static List<LexicalTokenInfo> Lex(List<StringTokenInfo> stringTokens)
+        {
+            if (stringTokens == null || stringTokens.Count == 0)
+                throw new ArgumentException($"{nameof(stringTokens)} must not be null or empty", nameof(stringTokens));
+
+            var lexicalTokens = new List<LexicalTokenInfo>();
+            var stringTokenQueue = new Queue<StringTokenInfo>(stringTokens);
+            while (stringTokenQueue.Count != 0)
+            {
+                var currentStringToken = stringTokenQueue.Dequeue();
+                var currentStringValue = currentStringToken.Value;
+                switch (currentStringToken.Token)
+                {
+                    case StringToken.Unknown:
+                    {
+                        throw new AssemblerException($"Can't lex {nameof(StringToken.Unknown)}");
+                    }
+                    case StringToken.EndOfLine:
+                    {
+                        // Discard leading newlines in the stringTokens list, as well as collapse
+                        // groups of 2 or more newlines into a single newline entry
+                        if (lexicalTokens.Count() > 1 && lexicalTokens.Last().Token != LexicalToken.EndOfLine)
+                        {
+                            lexicalTokens.Add(new LexicalTokenInfo(LexicalToken.EndOfLine, currentStringToken));
+                        }
+                        continue;
+                    }
+                    case StringToken.Whitespace:
+                    case StringToken.Comment:
+                    {
+                        continue;
+                    }
+                    case StringToken.String:
+                    {
+                        currentStringValue = currentStringValue.Substring(1);
+                        currentStringValue = currentStringValue.Substring(0, currentStringValue.Length - 1);
+                        lexicalTokens.Add(new LToken<string>(LexicalToken.String, currentStringValue, currentStringToken));
+                        continue;
+                    }
+                    case StringToken.Symbol:
+                    {
+                        if (sSymbolLexicalTokenStrings.TryGetValue(currentStringValue, out LexicalToken lexicalToken))
+                        {
+                            lexicalTokens.Add(new LToken<string>(lexicalToken, currentStringValue, currentStringToken));
+                            continue;
+                        }
+                        else
+                        {
+                            throw new AssemblerException();
+                        }
+                    }
+                    case StringToken.HexNumber:
+                    {
+                        var parseString = currentStringValue.Substring(2);
+                        // TODO: impossible to fail parsing?
+                        var hexNumberValue = uint.Parse(parseString, NumberStyles.AllowHexSpecifier, CultureInfo.InvariantCulture);
+                        lexicalTokens.Add(new LToken<uint>(LexicalToken.Number, hexNumberValue, currentStringToken));
+                        continue;
+                    }
+                    case StringToken.Number:
+                    {
+                        // TODO: impossible to fail parsing?
+                        var numberValue = uint.Parse(currentStringValue);
+                        lexicalTokens.Add(new LToken<uint>(LexicalToken.Number, numberValue, currentStringToken));
+                        continue;
+                    }
+                    case StringToken.Identifier:
+                    {
+                        if (Enum.TryParse(currentStringValue, true, out RegisterName registerName))
+                        {
+                            lexicalTokens.Add(new LToken<RegisterName>(LexicalToken.Register, registerName, currentStringToken));
+                            continue;
+                        }
+                        else if (Enum.TryParse(currentStringValue, true, out Opcode opcode))
+                        {
+                            lexicalTokens.Add(new LToken<Opcode>(LexicalToken.Opcode, opcode, currentStringToken));
+                            continue;
+                        }
+                        else if (Enum.TryParse(currentStringValue, true, out Directive directiveName))
+                        {
+                            lexicalTokens.Add(new LToken<Directive>(LexicalToken.Directive, directiveName, currentStringToken));
+                            continue;
+                        }
+                        else
+                        {
+                            lexicalTokens.Add(new LToken<string>(LexicalToken.Identifier, currentStringValue, currentStringToken));
+                            continue;
+                        }
+                        throw new AssemblerException();
+                    }
+                    default:
+                    {
+                        throw new AssemblerException();
+                    }
+                }
+                throw new AssemblerException();
+            }
+            return lexicalTokens;
+        }
+
+        public static BytecodeGroup GenerateBytecode(List<ASTNode> astNodes)
+        {
+            var totalBytes = 0;
+            var labelDefines = new Dictionary<string, int>();
+            var labelRefs = new Dictionary<string, List<int>>();
+            var relocationIndicies = new HashSet<int>(); // TODO
+
+            for (int x = 0; x < astNodes.Count; x++)
+            {
+                var node = astNodes[x];
+                if (node.Label != null)
+                {
+                    labelDefines.Add(node.Label.Value, totalBytes);
+                    labelRefs.Add(node.Label.Value, new List<int>());
+                }
+
+                switch (node.Type)
+                {
+                    case ASTNodeType.Binary:
+                    {
+                        var astBinary = (ASTBinary)node;
+                        totalBytes += astBinary.Bytes.Length;
+                        break;
+                    }
+                    case ASTNodeType.Opcode:
+                    {
+                        var astOpcode = (ASTOpcode)node;
+                        totalBytes += astOpcode.GetDef().ByteLength;
+                        break;
+                    }
+                }
+            }
+
+            var finalBytes = new byte[totalBytes];
+            var byteIndex = 0;
+            for (int x = 0; x < astNodes.Count; x++)
+            {
+                var node = astNodes[x];
+                switch (node.Type)
+                {
+                    case ASTNodeType.Binary:
+                    {
+                        var astBinary = (ASTBinary)node;
+                        var binaryBytes = astBinary.Bytes;
+                        Array.Copy(binaryBytes, 0, finalBytes, byteIndex, binaryBytes.Length);
+                        byteIndex += binaryBytes.Length;
+                        break;
+                    }
+                    case ASTNodeType.Opcode:
+                    {
+                        var astOpcode = (ASTOpcode)node;
+                        var opcodeDef = astOpcode.GetDef();
+                        switch (opcodeDef.ArgumentType)
+                        {
+                            case OpcodeArgumentType.NONE:
+                            {
+                                var opcodeWord = opcodeDef.CodeHint;
+                                var opcodeBytes = BitConverter.GetBytes(opcodeWord).Reverse().ToArray();
+                                Array.Copy(opcodeBytes, 0, finalBytes, byteIndex, opcodeBytes.Length);
+                                byteIndex += opcodeBytes.Length;
+                                break;
+                            }
+                            case OpcodeArgumentType.REG:
+                            {
+                                var opcodeWord = opcodeDef.CodeHint;
+                                opcodeWord += (byte)astOpcode.RegisterA;
+                                var opcodeBytes = BitConverter.GetBytes(opcodeWord).Reverse().ToArray();
+                                Array.Copy(opcodeBytes, 0, finalBytes, byteIndex, opcodeBytes.Length);
+                                byteIndex += opcodeBytes.Length;
+                                break;
+                            }
+                            case OpcodeArgumentType.IMMED:
+                            {
+                                var opcodeWord = opcodeDef.CodeHint;
+                                var opcodeBytes = BitConverter.GetBytes(opcodeWord).Reverse().ToArray();
+                                Array.Copy(opcodeBytes, 0, finalBytes, byteIndex, opcodeBytes.Length);
+                                byteIndex += opcodeBytes.Length;
+
+                                UInt16 immedWord;
+                                if (astOpcode.ImmedConstant.HasValue)
+                                {
+                                    immedWord = (UInt16)astOpcode.ImmedConstant.Value;
+                                }
+                                else
+                                {
+                                    immedWord = (UInt16)labelDefines[astOpcode.ImmedIdent.Value];
+                                    labelRefs[astOpcode.ImmedIdent.Value].Add(byteIndex);
+                                }
+                                var immedBytes = BitConverter.GetBytes(immedWord).Reverse().ToArray();
+                                Array.Copy(immedBytes, 0, finalBytes, byteIndex, immedBytes.Length);
+                                byteIndex += immedBytes.Length;
+                                break;
+                            }
+                            case OpcodeArgumentType.REG_REG:
+                            {
+                                var opcodeWord = opcodeDef.CodeHint;
+                                opcodeWord += (UInt16)(((byte)astOpcode.RegisterA) << 4);
+                                opcodeWord += (byte)astOpcode.RegisterB;
+                                var opcodeBytes = BitConverter.GetBytes(opcodeWord).Reverse().ToArray();
+                                Array.Copy(opcodeBytes, 0, finalBytes, byteIndex, opcodeBytes.Length);
+                                byteIndex += opcodeBytes.Length;
+                                break;
+                            }
+                            case OpcodeArgumentType.REG_IMMED:
+                            {
+                                var opcodeWord = opcodeDef.CodeHint;
+                                opcodeWord += (byte)astOpcode.RegisterA;
+                                var opcodeBytes = BitConverter.GetBytes(opcodeWord).Reverse().ToArray();
+                                Array.Copy(opcodeBytes, 0, finalBytes, byteIndex, opcodeBytes.Length);
+                                byteIndex += opcodeBytes.Length;
+
+                                UInt16 immedWord;
+                                if (astOpcode.ImmedConstant.HasValue)
+                                {
+                                    immedWord = (UInt16)astOpcode.ImmedConstant.Value;
+                                }
+                                else
+                                {
+                                    immedWord = (UInt16)labelDefines[astOpcode.ImmedIdent.Value];
+                                    labelRefs[astOpcode.ImmedIdent.Value].Add(byteIndex);
+                                }
+                                var immedBytes = BitConverter.GetBytes(immedWord).Reverse().ToArray();
+                                Array.Copy(immedBytes, 0, finalBytes, byteIndex, immedBytes.Length);
+                                byteIndex += immedBytes.Length;
+                                break;
+                            }
+                            case OpcodeArgumentType.REG_REG_IMMED:
+                            {
+                                var opcodeWord = opcodeDef.CodeHint;
+                                opcodeWord += (UInt16)(((byte)astOpcode.RegisterA) << 4);
+                                opcodeWord += (byte)astOpcode.RegisterB;
+                                var opcodeBytes = BitConverter.GetBytes(opcodeWord).Reverse().ToArray();
+                                Array.Copy(opcodeBytes, 0, finalBytes, byteIndex, opcodeBytes.Length);
+                                byteIndex += opcodeBytes.Length;
+
+                                UInt16 immedWord;
+                                if (astOpcode.ImmedConstant.HasValue)
+                                {
+                                    immedWord = (UInt16)astOpcode.ImmedConstant.Value;
+                                }
+                                else
+                                {
+                                    immedWord = (UInt16)labelDefines[astOpcode.ImmedIdent.Value];
+                                    labelRefs[astOpcode.ImmedIdent.Value].Add(byteIndex);
+                                }
+                                var immedBytes = BitConverter.GetBytes(immedWord).Reverse().ToArray();
+                                Array.Copy(immedBytes, 0, finalBytes, byteIndex, immedBytes.Length);
+                                byteIndex += immedBytes.Length;
+                                break;
+                            }
+                        }
+                        break;
+                    }
+                }
+            }
+
+            return new BytecodeGroup
+            {
+                LabelDefines = labelDefines,
+                LabelRefs = labelRefs,
+                RelocationIndicies = relocationIndicies,
+                Bytes = finalBytes,
+            };
+        }
+
+    }
+}

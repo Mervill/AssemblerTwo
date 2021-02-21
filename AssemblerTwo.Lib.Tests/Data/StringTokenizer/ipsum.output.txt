@@ -1,0 +1,193 @@
+Identifier, `Lorem`
+Whitespace, ` `
+Identifier, `Ipsum`
+Whitespace, ` `
+Identifier, `is`
+Whitespace, ` `
+Identifier, `simply`
+Whitespace, ` `
+Identifier, `dummy`
+Whitespace, ` `
+Identifier, `text`
+Whitespace, ` `
+Identifier, `of`
+Whitespace, ` `
+Identifier, `the`
+Whitespace, ` `
+Identifier, `printing`
+Whitespace, ` `
+Identifier, `and`
+Whitespace, ` `
+Identifier, `typesetting`
+EndOfLine , {EndOfLine}
+Identifier, `industry`
+Symbol    , `.`
+Whitespace, ` `
+Identifier, `Lorem`
+Whitespace, ` `
+Identifier, `Ipsum`
+Whitespace, ` `
+Identifier, `has`
+Whitespace, ` `
+Identifier, `been`
+Whitespace, ` `
+Identifier, `the`
+Whitespace, ` `
+Identifier, `industry`
+Symbol    , `'`
+Identifier, `s`
+Whitespace, ` `
+Identifier, `standard`
+Whitespace, ` `
+Identifier, `dummy`
+EndOfLine , {EndOfLine}
+Identifier, `text`
+Whitespace, ` `
+Identifier, `ever`
+Whitespace, ` `
+Identifier, `since`
+Whitespace, ` `
+Identifier, `the`
+Whitespace, ` `
+Number    , `1500`
+Identifier, `s`
+Symbol    , `,`
+Whitespace, ` `
+Identifier, `when`
+Whitespace, ` `
+Identifier, `an`
+Whitespace, ` `
+Identifier, `unknown`
+Whitespace, ` `
+Identifier, `printer`
+Whitespace, ` `
+Identifier, `took`
+Whitespace, ` `
+Identifier, `a`
+Whitespace, ` `
+Identifier, `galley`
+EndOfLine , {EndOfLine}
+Identifier, `of`
+Whitespace, ` `
+Identifier, `type`
+Whitespace, ` `
+Identifier, `and`
+Whitespace, ` `
+Identifier, `scrambled`
+Whitespace, ` `
+Identifier, `it`
+Whitespace, ` `
+Identifier, `to`
+Whitespace, ` `
+Identifier, `make`
+Whitespace, ` `
+Identifier, `a`
+Whitespace, ` `
+Identifier, `type`
+Whitespace, ` `
+Identifier, `specimen`
+Whitespace, ` `
+Identifier, `book`
+Symbol    , `.`
+Whitespace, ` `
+Identifier, `It`
+Whitespace, ` `
+Identifier, `has`
+EndOfLine , {EndOfLine}
+Identifier, `survived`
+Whitespace, ` `
+Identifier, `not`
+Whitespace, ` `
+Identifier, `only`
+Whitespace, ` `
+Identifier, `five`
+Whitespace, ` `
+Identifier, `centuries`
+Symbol    , `,`
+Whitespace, ` `
+Identifier, `but`
+Whitespace, ` `
+Identifier, `also`
+Whitespace, ` `
+Identifier, `the`
+Whitespace, ` `
+Identifier, `leap`
+Whitespace, ` `
+Identifier, `into`
+Whitespace, ` `
+Identifier, `electronic`
+EndOfLine , {EndOfLine}
+Identifier, `typesetting`
+Symbol    , `,`
+Whitespace, ` `
+Identifier, `remaining`
+Whitespace, ` `
+Identifier, `essentially`
+Whitespace, ` `
+Identifier, `unchanged`
+Symbol    , `.`
+Whitespace, ` `
+Identifier, `It`
+Whitespace, ` `
+Identifier, `was`
+Whitespace, ` `
+Identifier, `popularised`
+Whitespace, ` `
+Identifier, `in`
+EndOfLine , {EndOfLine}
+Identifier, `the`
+Whitespace, ` `
+Number    , `1960`
+Identifier, `s`
+Whitespace, ` `
+Identifier, `with`
+Whitespace, ` `
+Identifier, `the`
+Whitespace, ` `
+Identifier, `release`
+Whitespace, ` `
+Identifier, `of`
+Whitespace, ` `
+Identifier, `Letraset`
+Whitespace, ` `
+Identifier, `sheets`
+Whitespace, ` `
+Identifier, `containing`
+Whitespace, ` `
+Identifier, `Lorem`
+EndOfLine , {EndOfLine}
+Identifier, `Ipsum`
+Whitespace, ` `
+Identifier, `passages`
+Symbol    , `,`
+Whitespace, ` `
+Identifier, `and`
+Whitespace, ` `
+Identifier, `more`
+Whitespace, ` `
+Identifier, `recently`
+Whitespace, ` `
+Identifier, `with`
+Whitespace, ` `
+Identifier, `desktop`
+Whitespace, ` `
+Identifier, `publishing`
+EndOfLine , {EndOfLine}
+Identifier, `software`
+Whitespace, ` `
+Identifier, `like`
+Whitespace, ` `
+Identifier, `Aldus`
+Whitespace, ` `
+Identifier, `PageMaker`
+Whitespace, ` `
+Identifier, `including`
+Whitespace, ` `
+Identifier, `versions`
+Whitespace, ` `
+Identifier, `of`
+Whitespace, ` `
+Identifier, `Lorem`
+Whitespace, ` `
+Identifier, `Ipsum`
+Symbol    , `.`

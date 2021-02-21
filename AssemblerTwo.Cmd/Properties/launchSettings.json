@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "AssemblerTwo.Cmd": {
+      "commandName": "Project",
+      "commandLineArgs": "-f ./Sources/pangram.asm2.txt"
+    }
+  }
+}

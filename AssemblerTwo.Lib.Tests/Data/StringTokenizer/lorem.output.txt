@@ -1,0 +1,145 @@
+Identifier, `Lorem`
+Whitespace, ` `
+Identifier, `ipsum`
+Whitespace, ` `
+Identifier, `dolor`
+Whitespace, ` `
+Identifier, `sit`
+Whitespace, ` `
+Identifier, `amet`
+Symbol    , `,`
+Whitespace, ` `
+Identifier, `consectetur`
+Whitespace, ` `
+Identifier, `adipiscing`
+Whitespace, ` `
+Identifier, `elit`
+Symbol    , `,`
+Whitespace, ` `
+Identifier, `sed`
+Whitespace, ` `
+Identifier, `do`
+Whitespace, ` `
+Identifier, `eiusmod`
+Whitespace, ` `
+Identifier, `tempor`
+Whitespace, ` `
+Identifier, `incididunt`
+Whitespace, ` `
+Identifier, `ut`
+Whitespace, ` `
+Identifier, `labore`
+Whitespace, ` `
+Identifier, `et`
+Whitespace, ` `
+Identifier, `dolore`
+Whitespace, ` `
+Identifier, `magna`
+EndOfLine , {EndOfLine}
+Identifier, `aliqua`
+Symbol    , `.`
+Whitespace, ` `
+Identifier, `Ut`
+Whitespace, ` `
+Identifier, `enim`
+Whitespace, ` `
+Identifier, `ad`
+Whitespace, ` `
+Identifier, `minim`
+Whitespace, ` `
+Identifier, `veniam`
+Symbol    , `,`
+Whitespace, ` `
+Identifier, `quis`
+Whitespace, ` `
+Identifier, `nostrud`
+Whitespace, ` `
+Identifier, `exercitation`
+Whitespace, ` `
+Identifier, `ullamco`
+Whitespace, ` `
+Identifier, `laboris`
+Whitespace, ` `
+Identifier, `nisi`
+Whitespace, ` `
+Identifier, `ut`
+Whitespace, ` `
+Identifier, `aliquip`
+Whitespace, ` `
+Identifier, `ex`
+Whitespace, ` `
+Identifier, `ea`
+Whitespace, ` `
+Identifier, `commodo`
+Whitespace, ` `
+Identifier, `consequat`
+Symbol    , `.`
+EndOfLine , {EndOfLine}
+Identifier, `Duis`
+Whitespace, ` `
+Identifier, `aute`
+Whitespace, ` `
+Identifier, `irure`
+Whitespace, ` `
+Identifier, `dolor`
+Whitespace, ` `
+Identifier, `in`
+Whitespace, ` `
+Identifier, `reprehenderit`
+Whitespace, ` `
+Identifier, `in`
+Whitespace, ` `
+Identifier, `voluptate`
+Whitespace, ` `
+Identifier, `velit`
+Whitespace, ` `
+Identifier, `esse`
+Whitespace, ` `
+Identifier, `cillum`
+Whitespace, ` `
+Identifier, `dolore`
+Whitespace, ` `
+Identifier, `eu`
+Whitespace, ` `
+Identifier, `fugiat`
+Whitespace, ` `
+Identifier, `nulla`
+Whitespace, ` `
+Identifier, `pariatur`
+Symbol    , `.`
+Whitespace, ` `
+Identifier, `Excepteur`
+Whitespace, ` `
+Identifier, `sint`
+EndOfLine , {EndOfLine}
+Identifier, `occaecat`
+Whitespace, ` `
+Identifier, `cupidatat`
+Whitespace, ` `
+Identifier, `non`
+Whitespace, ` `
+Identifier, `proident`
+Symbol    , `,`
+Whitespace, ` `
+Identifier, `sunt`
+Whitespace, ` `
+Identifier, `in`
+Whitespace, ` `
+Identifier, `culpa`
+Whitespace, ` `
+Identifier, `qui`
+Whitespace, ` `
+Identifier, `officia`
+Whitespace, ` `
+Identifier, `deserunt`
+Whitespace, ` `
+Identifier, `mollit`
+Whitespace, ` `
+Identifier, `anim`
+Whitespace, ` `
+Identifier, `id`
+Whitespace, ` `
+Identifier, `est`
+Whitespace, ` `
+Identifier, `laborum`
+Symbol    , `.`

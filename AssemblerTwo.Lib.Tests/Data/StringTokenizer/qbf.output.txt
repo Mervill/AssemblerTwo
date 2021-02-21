@@ -1,0 +1,17 @@
+Identifier, `The`
+Whitespace, ` `
+Identifier, `quick`
+Whitespace, ` `
+Identifier, `brown`
+Whitespace, ` `
+Identifier, `fox`
+Whitespace, ` `
+Identifier, `jumps`
+Whitespace, ` `
+Identifier, `over`
+Whitespace, ` `
+Identifier, `the`
+Whitespace, ` `
+Identifier, `lazy`
+Whitespace, ` `
+Identifier, `dog`

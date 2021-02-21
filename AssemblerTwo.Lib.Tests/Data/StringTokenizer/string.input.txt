@@ -1,0 +1,9 @@
+; Strings
+""
+" "
+"Hello World"
+"Hello	World"
+"Hello 0xF00D World"
+"; Hello World"
+"; Hello	World"
+"; Hello 0xF00D World"

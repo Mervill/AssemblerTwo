@@ -1,0 +1,49 @@
+;
+; VTerm Pangrams Test
+;
+        NAME    "pangrams"
+        
+        COPYI   S,0xFFFF
+        EI
+LOOP:   COPYI   P,TXTA
+        CALL    MSG
+        COPYI   P,TXTB
+        CALL    MSG
+        COPYI   P,TXTC
+        CALL    MSG
+        COPYI   P,TXTD
+        CALL    MSG
+        COPYI   P,TXTE
+        CALL    MSG
+        JUMP    LOOP
+        HALT
+        
+TXTA:   PUT     "The quick brown fox jumps over the lazy dog \0"
+TXTB:   PUT     "Amazingly few discotheques provide jukeboxes \0"
+TXTC:   PUT     "A quick movement of the enemy will jeopardize six gunboats \0"
+TXTD:   PUT     "Jackdaws love my big sphinx of quartz \0"
+TXTE:   PUT     "Pack my box with five dozen liquor jugs \0"
+
+;REGION MSG
+MSG:    LOAD    P,M   ; Load the word at `P` into `M`
+        HI      M,N   ; Put HI byte of `M` into `N`
+        REZ     N     ; If `N` equals 0, return (we're done)
+        COPY    N,A   ; Copy `N` into `A`
+        CALL    PCHAR ; Print the char
+        LO      M,N   ; Put LO byte of `M` into `N`
+        REZ     N     ; if `N` equals 0, return (we're done)
+        COPY    N,A   ; Copy `N` into `A`
+        CALL    PCHAR ; Print the char
+        ADDI    P,2   ; Increment the pointer
+        JUMP    MSG
+;ENDREGION
+
+;REGION PCHAR
+PCHAR:  DI
+        OUTI A,0x0A
+        EI
+        RET
+;ENDREGION
+
+        HALT
+;       END

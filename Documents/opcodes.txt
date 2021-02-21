@@ -1,0 +1,187 @@
+#
+# This file should be considered the primary / 'most correct' list of opcodes, until formal docs can be written (lol)
+#
+
+==============================
+== REGISTERS
+
+0x0 - A - General Use
+0x1 - B - General Use
+0x2 - C - General Use
+0x3 - D - General Use
+0x4 - E - General Use
+0x5 - F - General Use
+0x6 - G - General Use
+0x7 - H - General Use
+0x8 - I - General Use
+0x9 - J - General Use
+0xA - K - General Use
+0xB - L - General Use
+0xC - M - General Use
+0xD - N - General Use
+0xE - P - 'Pointer' or General Use
+0xF - S - Stack Pointer
+
+==============================
+== OPCODES
+
+PROPERTIES:
+- Byte Addressable
+
+NEED:
+- Error handling scheme (invalid opcode)
+
+NOTES:
+- All math operations except DIV are sign invariant (these operations work 
+  with signed and unsigned numbers)
+  
+QUESTIONS:
+- Remove Conditional Calling? (CLT, CLTE, etc)
+- Need to replace pow with Signed Modulus?
+- Do we even need POW at all?
+- Conditional call not required?
+- Above / Below required (pretty sure yes)
+
+[0xA]
+0x0 ADD     r1 r2   Addition              r2 = r1 + r2
+0x1 SUB     r1 r2   Subtraction           r2 = r1 - r2
+0x2 MUL     r1 r2   Multiplication        r2 = r1 * r2
+0x3 DIV     r1 r2   Division              r2 = r1 / r2
+0x4 DIV.S   r1 r2   Signed Division       
+0x5 MOD     r1 r2   Modulus               r2 = r1 % r2
+0x6 AND     r1 r2   Bitwise AND           r2 = r1 & r2
+0x7 OR      r1 r2   Bitwise OR            r2 = r1 | r2
+0x8 XOR     r1 r2   Bitwise XOR           r2 = r1 ^ r2
+0x9 SHL     r1 r2   Bitwise Shift Left    r2 = r1 >> r2
+0xA SHR     r1 r2   Bitwise Shift Right   r2 = r1 << r2
+0xB POW     r1 r2
+0xC ??
+0xD ??
+0xE ??
+0xF ->
+	0x0 ADD.I   r1      i:value   Addition              r1 = r1 + i16
+	0x1 SUB.I   r1      i:value   Subtraction           r1 = r1 - i16
+	0x2 MUL.I   r1      i:value   Multiplication        r1 = r1 * i16
+	0x3 DIV.I   r1      i:value   Division              r1 = r1 / i16
+	0x4 DIV.SI  r1      i:value   Signed Division       
+	0x5 MOD.I   r1      i:value   Modulus               r1 = r1 % i16
+	0x6 AND.I   r1      i:value   Bitwise AND           r1 = r1 & i16
+	0x7 OR.I    r1      i:value   Bitwise OR            r1 = r1 | i16
+	0x8 XOR.I   r1      i:value   Bitwise XOR           r1 = r1 ^ i16
+	0x9 SHL.I   r1      i:value   Bitwise Shift Left    r1 = r1 >> i16
+	0xA SHR.I   r1      i:value   Bitwise Shift Right   r1 = r1 << i16
+	0xB POW.I   r1      i:value   
+	0xC INC     r1                Increment by 1        r1 = r1 + 1
+	0xD DEC     r1                Decrement by 1        r1 = r1 - 1
+	0xE NOT     r1                Bitwise NOT           r1 = ~r1
+	0xF NEG     r1                Signed Negation       r1 = -r1
+
+[0xB]
+0x0 J.LT    r1 r2   i:offst   Jump less than
+0x1 J.LTE   r1 r2   i:offst   Jump less than or equal
+0x2 J.GT    r1 r2   i:offst   Jump greater than
+0x3 J.GTE   r1 r2   i:offst   Jump greater than or equal
+0x4 J.B     r1 r2   i:offst   
+0x5 J.BE    r1 r2   i:offst   
+0x6 J.A     r1 r2   i:offst   
+0x7 J.AE    r1 r2   i:offst   
+0x8 J.EQ    r1 r2   i:offst   Jump equal
+0x9 J.NEQ   r1 r2   i:offst   Jump not equal
+0xA C.LT    r1 r2   i:offst   Call less than
+0xB C.LTE   r1 r2   i:offst   Call less than equal
+0xC C.GT    r1 r2   i:offst   Call greater than
+0xD C.GTE   r1 r2   i:offst   Call greater than equal
+0xE C.B     r1 r2   i:offst   
+0xF C.BE    r1 r2   i:offst   
+
+[0xC]
+0x0 C.A     r1 r2   i:offst
+0x1 C.AE    r1 r2   i:offst
+0x2 C.EQ    r1 r2   i:offst   Call equal
+0x3 C.NEQ   r1 r2   i:offst   Call not equal
+0x4 R.LT    r1 r2             Return less than`
+0x5 R.LTE   r1 r2             Return less than equal
+0x6 R.GT    r1 r2             Return greater than
+0x7 R.GTE   r1 r2             Return greater than or equal
+0x8 R.B     r1 r2             
+0x9 R.BE    r1 r2             
+0xA R.A     r1 r2             
+0xB R.AE    r1 r2             
+0xC R.EQ    r1 r2             Return equal
+0xD R.NEQ   r1 r2             Return not equal
+0xE ?? 
+0xF ?? 
+
+[0xD]
+0x0 COPY    r1 r2	Copy Register	rB = rA
+0x1 LOAD    r1 r2	Memory Load 	rB = mem[rA]
+0x2 STOR    r1 r2	Memory Store 	mem[rB] = rA
+0x3 PLOAD   r1 r2	Pointer load
+0x4 PSTOR   r1 r2	Pointer store
+0x5 ??
+0x6 ??
+0x7 ??
+0x8 ??
+0x9 RXR     r1 r2	Register exchange r1 <-> r2
+0xA RXM     r1 r2	Register memory exchange 
+0xB HI      r1 r2	Select upper 8 bits of r1 and store in r2
+0xC LO      r1 r2	Select lower 8 bits of r1 and store in r2
+0xD IN      r1 r2	Read from port [r1 data register, r2 port register]
+0xE ->
+	0x0 COPY.I  r1    [i:value] Load the immediate value into r1
+	0x1 PLOAD.I r1    [immediate]
+	0x2 PSTOR.I r1    [immediate]
+	0x3 IN.I    r1    [i:port number]
+	0x4 OUT.I   r1    [i:port number]
+	0x5 SHAL    r1    [immediate]	Arithmetic Shift Left
+	0x6 SHAR    r1    [immediate]	Arithmetic Shift Right
+	0x7 ROTL    r1    [immediate]
+	0x8 ROTR    r1    [immediate]
+	0x9 JUMP.R  r1               	Jump address register
+	0xA ->
+		0x0 SYSCALL [i:value]
+		0x1 SYSRET
+		0x2 POP.R
+		0x3 PUSH.R
+		0x4 ?? PUSH.I [immediate]
+		0x5 ?? CONT
+		0x6 ?? YIELD [YIELD CODE]
+		0x7 ?? AICTRL [code]
+		0x8 ?? FLUSH
+		0x9 ?? DONT FLUSH
+		0xA JUMP    [i:addr]	Jump address immediate
+		0xB CALL    [i:addr]	Call address immediate
+		0xC RET     
+		0xD HALT    CPU Halt
+		0xE EI      Enable interrupts
+		0xF DI      Disable interrupts
+	0xB CALL.R  r1    Call address register
+	0xC PUSH    r1
+	0xD POP     r1
+	0xE INTE    r1 // ?
+	0xF CPUID   r1
+0xF OUT     r1 r2
+
+[ 0xE ]
+...
+
+[ 0xF ]
+...
+0xF ->
+	0x0 J.EZ    r1    [i:addr]	Jump equal zero
+	0x1 J.LZ    r1    [i:addr]	Jump less than zero
+	0x2 J.LEZ   r1    [i:addr]	Jump less than or equal zero
+	0x3 J.GZ    r1    [i:addr]	Jump greater than zero
+	0x4 J.GEZ   r1    [i:addr]	Jump greater than or equal zero
+	0x5 C.EZ    r1    [i:addr]	Call equal zero
+	0x6 C.LZ    r1    [i:addr]	Call less than zero
+	0x7 C.LEZ   r1    [i:addr]	Call less than or equal zero
+	0x8 C.GZ    r1    [i:addr]	Call greater than zero
+	0x9 C.GEZ   r1    [i:addr]	Call greater than or equal zero
+	0xA R.EZ    r1            	Return equal zero
+	0xB R.LZ    r1            	Return less than zero
+	0xC R.LEZ   r1            	Return less than or equal zero
+	0xD R.GZ    r1            	Return greater than zero
+	0xE R.GEZ   r1            	Return greater than or equal zero
+	0xF ->
+		0x0 NOP - 0xFFF0

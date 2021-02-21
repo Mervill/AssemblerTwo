@@ -1,0 +1,17 @@
+Comment   , `; Strings`
+EndOfLine , {EndOfLine}
+String    , `""`
+EndOfLine , {EndOfLine}
+String    , `" "`
+EndOfLine , {EndOfLine}
+String    , `"Hello World"`
+EndOfLine , {EndOfLine}
+String    , `"Hello\tWorld"`
+EndOfLine , {EndOfLine}
+String    , `"Hello 0xF00D World"`
+EndOfLine , {EndOfLine}
+String    , `"; Hello World"`
+EndOfLine , {EndOfLine}
+String    , `"; Hello\tWorld"`
+EndOfLine , {EndOfLine}
+String    , `"; Hello 0xF00D World"`

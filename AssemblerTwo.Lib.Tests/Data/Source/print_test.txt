@@ -1,0 +1,28 @@
+;
+; Super awesome test script
+;
+		NAME    "Test Script"
+
+		COPYI	S,0x00FF
+		COPYI   P,TXT
+		CALL    MSG
+		HALT
+		
+TXT:	PUT     "Custom Assembly Language"
+
+;REGION MSG
+MSG:	LOAD    P,N   ; Load the word at `P` into `N`
+		REZ     N     ; If `N` equals 0, return (we're done)
+		CALL    PCHAR ; Print the word
+		INC     P     ; Increment the pointer
+		INC     P     ; Increment the pointer
+		JUMP    MSG
+;ENDREGION
+
+;REGION PCHAR
+PCHAR:  OUTI N,0x0A
+		RET
+;ENDREGION
+
+		HALT
+;		END

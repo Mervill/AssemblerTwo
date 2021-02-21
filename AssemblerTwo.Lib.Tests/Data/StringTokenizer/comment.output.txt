@@ -1,0 +1,9 @@
+Comment   , `;`
+EndOfLine , {EndOfLine}
+Comment   , `; Hello World`
+EndOfLine , {EndOfLine}
+Comment   , `; Hello\tWorld`
+EndOfLine , {EndOfLine}
+Comment   , `; Hello 0123456789 World`
+EndOfLine , {EndOfLine}
+Comment   , `; Hello 0xF00D World`

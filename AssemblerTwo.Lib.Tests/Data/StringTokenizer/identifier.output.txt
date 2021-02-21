@@ -1,0 +1,25 @@
+Comment   , `; Identifiers`
+EndOfLine , {EndOfLine}
+Identifier, `HelloWorld`
+EndOfLine , {EndOfLine}
+Identifier, `Hello_World`
+EndOfLine , {EndOfLine}
+Identifier, `H3110W0r1d`
+EndOfLine , {EndOfLine}
+Identifier, `H3110_W0r1d`
+EndOfLine , {EndOfLine}
+Identifier, `_HelloWorld`
+EndOfLine , {EndOfLine}
+Identifier, `_Hello_World`
+EndOfLine , {EndOfLine}
+Identifier, `_H3110W0r1d`
+EndOfLine , {EndOfLine}
+Identifier, `_H3110_W0r1d`
+EndOfLine , {EndOfLine}
+Identifier, `_42`
+EndOfLine , {EndOfLine}
+Identifier, `_0xDEAD`
+EndOfLine , {EndOfLine}
+Identifier, `abcdefghijklmnopqrstuvwxyz`
+EndOfLine , {EndOfLine}
+Identifier, `ABCDEFGHIJKLMNOPQRSTUVWXYZ`

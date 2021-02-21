@@ -1,0 +1,13 @@
+; Identifiers
+HelloWorld
+Hello_World
+H3110W0r1d
+H3110_W0r1d
+_HelloWorld
+_Hello_World
+_H3110W0r1d
+_H3110_W0r1d
+_42
+_0xDEAD
+abcdefghijklmnopqrstuvwxyz
+ABCDEFGHIJKLMNOPQRSTUVWXYZ

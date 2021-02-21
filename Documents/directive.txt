@@ -1,0 +1,2 @@
+NAME - Sets the name of a file
+PUT  - Embed a string or number literal
