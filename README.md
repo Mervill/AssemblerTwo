@@ -3,22 +3,32 @@ Hobbyist assembly language, assembler, and virtual machine
 
 ## Machine Definition
 
+The virtual machine is a 16-bit byte-addressed processor that has:
 
+- 16-bit Program Counter (64k Address Space)
+- 16-bit Registers
+- Registers: `A`, `B`, `C`, `D`, `E`, `F`, `G`, `H`, `I`, `J`, `K`, `L`, `M`, `N`, `P`, `S`. 
+- `S` - Stack Pointer manipulated by `PUSH`, `POP`, `CALL`, `RET` & others
+- No hard-wired accumulator; most instrctions are target/operand type (ie `ADD A,B`)
+
+See `/Documents/opcodes.txt` for the complete instruction listing. Please note that the list of opcodes in still in active design/development and can change without notice. Some opcodes in the list have yet to be implemented in code :shipit:
+
+## Sample Code
 
 ```
 ; MSG routine to print a null-terminated string, the first address
 ; of the string is passed as an argument via the P register
-MSG:    LOAD    P,M   ; Load the word at `P` into `M`
-        HI      M,N   ; Put HI byte of `M` into `N`
-        REZ     N     ; If `N` equals 0, return (we're done)
-        COPY    N,A   ; Copy `N` into `A`
-        CALL    PCHAR ; Print the char
-        LO      M,N   ; Put LO byte of `M` into `N`
-        REZ     N     ; if `N` equals 0, return (we're done)
-        COPY    N,A   ; Copy `N` into `A`
-        CALL    PCHAR ; Print the char
-        ADDI    P,2   ; Increment the pointer
-        JUMP    MSG
+MSG: LOAD    P,M   ; Load the word at `P` into `M`
+     HI      M,N   ; Put HI byte of `M` into `N`
+     REZ     N     ; If `N` equals 0, return (we're done)
+     COPY    N,A   ; Copy `N` into `A`
+     CALL    PCHAR ; Print the char
+     LO      M,N   ; Put LO byte of `M` into `N`
+     REZ     N     ; if `N` equals 0, return (we're done)
+     COPY    N,A   ; Copy `N` into `A`
+     CALL    PCHAR ; Print the char
+     ADDI    P,2   ; Increment the pointer
+     JUMP    MSG
 ```
 
 # AssemblerTwo.Cmd
