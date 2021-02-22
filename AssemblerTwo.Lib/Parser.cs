@@ -260,8 +260,53 @@ namespace AssemblerTwo.Lib
                 }
                 case OpcodeArgumentType.REG_REG_IMMED:
                 {
-                    lexicalTokens.RemoveRange(0, 5);
-                    throw new NotImplementedException();
+                    //lexicalTokens.RemoveRange(0, 5);
+                    //throw new NotImplementedException();
+                    var nextLToken1 = lexicalTokens[1];
+                    var nextLToken2 = lexicalTokens[2];
+                    var nextLToken3 = lexicalTokens[3];
+                    var nextLToken4 = lexicalTokens[4];
+                    if (nextLToken1.Token == LexicalToken.Register &&
+                        nextLToken2.Token == LexicalToken.SymComma &&
+                        nextLToken3.Token == LexicalToken.Register &&
+                        nextLToken4.Token == LexicalToken.SymComma)
+                    {
+                        var lRegisterA = (LToken<RegisterName>)nextLToken1;
+                        var lRegisterB = (LToken<RegisterName>)nextLToken3;
+
+                        var astOpcode = new ASTOpcode();
+                        astOpcode.LOpcode = lOpcode;
+                        astOpcode.LRegisterA = lRegisterA;
+                        astOpcode.LRegisterB = lRegisterB;
+
+                        var immediateTokens = GetImmediateValue(lexicalTokens, 5,
+                            out astOpcode.ImmedConstant,
+                            out astOpcode.ImmedIdent);
+
+                        //if (astOpcode.ImmedIdent != null)
+                        //{
+                        //    identsRefrenced.Add(astOpcode.ImmedIdent);
+                        //}
+
+                        astOpcode.ImmedLTokens = immediateTokens;
+
+                        if (unanchoredLabel != null)
+                        {
+                            astOpcode.Label = unanchoredLabel;
+                            unanchoredLabel = null;
+                        }
+
+                        var len = 5 + immediateTokens.Length;
+                        astOpcode.LexTokens = lexicalTokens.GetRange(0, len);
+                        lexicalTokens.RemoveRange(0, len);
+
+                        partialResult.SyntaxTree.Add(astOpcode);
+                        return;
+                    }
+                    else
+                    {
+                        throw new AssemblerException();
+                    }
                 }
                 default: throw new UnknownStateException();
             }
@@ -298,35 +343,58 @@ namespace AssemblerTwo.Lib
                 case Directive.PUT:
                 {
                     var nextLToken1 = lexicalTokens[1];
-                    if (nextLToken1.Token == LexicalToken.String)
+                    switch (nextLToken1.Token)
                     {
-                        var putStringToken = ((LToken<string>)nextLToken1);
-
-                        var astBinary = new ASTBinary();
-
-                        // Use ascii encoding for now, but we should actually use 'no encoding'
-                        // http://stackoverflow.com/questions/472906
-                        var unescape = System.Text.RegularExpressions.Regex.Unescape(putStringToken.Value);
-                        var lst = Assembler.TxtEncoding.GetBytes(unescape).ToList();
-                        //lst.Add(0);
-                        astBinary.Bytes = lst.ToArray();
-
-                        if (unanchoredLabel != null)
+                        case LexicalToken.String:
                         {
-                            astBinary.Label = unanchoredLabel;
-                            unanchoredLabel = null;
+                            var putStringToken = ((LToken<string>)nextLToken1);
+
+                            var astBinary = new ASTBinary();
+
+                            // Use ascii encoding for now, but we should actually use 'no encoding'
+                            // http://stackoverflow.com/questions/472906
+                            var unescape = System.Text.RegularExpressions.Regex.Unescape(putStringToken.Value);
+                            var lst = Assembler.TxtEncoding.GetBytes(unescape).ToList();
+                            //lst.Add(0);
+                            astBinary.Bytes = lst.ToArray();
+
+                            if (unanchoredLabel != null)
+                            {
+                                astBinary.Label = unanchoredLabel;
+                                unanchoredLabel = null;
+                            }
+
+                            astBinary.LexTokens = lexicalTokens.GetRange(0, 2);
+                            lexicalTokens.RemoveRange(0, 2);
+
+                            partialResult.SyntaxTree.Add(astBinary);
+                            break;
                         }
+                        case LexicalToken.Number:
+                        {
+                            var putNumberToken = ((LToken<uint>)nextLToken1);
 
-                        astBinary.LexTokens = lexicalTokens.GetRange(0, 2);
-                        lexicalTokens.RemoveRange(0, 2);
+                            var astBinary = new ASTBinary();
+                            astBinary.Bytes = BitConverter.GetBytes(putNumberToken.Value).Reverse().ToArray();
 
-                        partialResult.SyntaxTree.Add(astBinary);
-                        break;
+                            if (unanchoredLabel != null)
+                            {
+                                astBinary.Label = unanchoredLabel;
+                                unanchoredLabel = null;
+                            }
+
+                            astBinary.LexTokens = lexicalTokens.GetRange(0, 2);
+                            lexicalTokens.RemoveRange(0, 2);
+
+                            partialResult.SyntaxTree.Add(astBinary);
+                            break;
+                        }
+                        default:
+                        {
+                            throw new AssemblerException();
+                        }
                     }
-                    else
-                    {
-                        throw new AssemblerException();
-                    }
+                    break;
                 }
                 default:
                 {
