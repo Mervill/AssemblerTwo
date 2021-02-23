@@ -67,8 +67,8 @@ namespace AssemblerTwo.Lib
                         var lIdent = (LToken<string>)currentLToken;
                         if (linePosition == 0)
                         {
-                            var nextLToken = lexicalTokens[1];
-                            if (nextLToken.Token == LexicalToken.SymColon)
+                            var nextLToken = ExpectLToken(lexicalTokens, 1, LexicalToken.SymColon, false);
+                            if (nextLToken != null)
                             {
                                 if (identsDefined.TryAdd(lIdent.Value, lIdent))
                                 {
@@ -79,17 +79,21 @@ namespace AssemblerTwo.Lib
                                 }
                                 else
                                 {
-                                    throw new AssemblerException();
+                                    throw new ParserException($"Duplicate label `{lIdent.Value}`", lIdent);
                                 }
                             }
                             else
                             {
-                                throw new AssemblerException();
+                                var message = $"Unknown opcode or directive `{lIdent.Value}`";
+                                var location = lIdent.StringTokens[0].ToString(true, true, false);
+                                throw new ParserException($"{message}{Environment.NewLine}{location}", lIdent);
                             }
                         }
                         else
                         {
-                            throw new AssemblerException();
+                            var message = $"Unknown opcode or directive `{lIdent.Value}`";
+                            var location = lIdent.StringTokens[0].ToString(true, true, false);
+                            throw new ParserException($"{message}{Environment.NewLine}{location}", lIdent);
                         }
                     }
                     default:
@@ -127,31 +131,25 @@ namespace AssemblerTwo.Lib
                 }
                 case OpcodeArgumentType.REG:
                 {
-                    var nextLToken = lexicalTokens[1];
-                    if (nextLToken.Token == LexicalToken.Register)
+                    var nextLToken = ExpectLToken(lexicalTokens, 1, LexicalToken.Register);
+                    
+                    var lRegisterA = (LToken<RegisterName>)nextLToken;
+
+                    var astOpcode = new ASTOpcode();
+                    astOpcode.LOpcode = lOpcode;
+                    astOpcode.LRegisterA = lRegisterA;
+
+                    if (unanchoredLabel != null)
                     {
-                        var lRegisterA = (LToken<RegisterName>)nextLToken;
-
-                        var astOpcode = new ASTOpcode();
-                        astOpcode.LOpcode = lOpcode;
-                        astOpcode.LRegisterA = lRegisterA;
-
-                        if (unanchoredLabel != null)
-                        {
-                            astOpcode.Label = unanchoredLabel;
-                            unanchoredLabel = null;
-                        }
-
-                        astOpcode.LexTokens = lexicalTokens.GetRange(0, 2);
-                        lexicalTokens.RemoveRange(0, 2);
-
-                        partialResult.SyntaxTree.Add(astOpcode);
-                        return;
+                        astOpcode.Label = unanchoredLabel;
+                        unanchoredLabel = null;
                     }
-                    else
-                    {
-                        throw new AssemblerException();
-                    }
+
+                    astOpcode.LexTokens = lexicalTokens.GetRange(0, 2);
+                    lexicalTokens.RemoveRange(0, 2);
+
+                    partialResult.SyntaxTree.Add(astOpcode);
+                    return;
                 }
                 case OpcodeArgumentType.IMMED:
                 {
@@ -184,129 +182,103 @@ namespace AssemblerTwo.Lib
                 }
                 case OpcodeArgumentType.REG_REG:
                 {
-                    var nextLToken1 = lexicalTokens[1];
-                    var nextLToken2 = lexicalTokens[2];
-                    var nextLToken3 = lexicalTokens[3];
-                    if (nextLToken1.Token == LexicalToken.Register &&
-                        nextLToken2.Token == LexicalToken.SymComma &&
-                        nextLToken3.Token == LexicalToken.Register)
+                    var nextLToken1 = ExpectLToken(lexicalTokens, 1, LexicalToken.Register);
+                    var nextLToken2 = ExpectLToken(lexicalTokens, 2, LexicalToken.SymComma);
+                    var nextLToken3 = ExpectLToken(lexicalTokens, 3, LexicalToken.Register);
+
+                    var lRegisterA = (LToken<RegisterName>)nextLToken1;
+                    var lRegisterB = (LToken<RegisterName>)nextLToken3;
+
+                    var astOpcode = new ASTOpcode();
+                    astOpcode.LOpcode = lOpcode;
+                    astOpcode.LRegisterA = lRegisterA;
+                    astOpcode.LRegisterB = lRegisterB;
+
+                    if (unanchoredLabel != null)
                     {
-                        var lRegisterA = (LToken<RegisterName>)nextLToken1;
-                        var lRegisterB = (LToken<RegisterName>)nextLToken3;
-
-                        var astOpcode = new ASTOpcode();
-                        astOpcode.LOpcode = lOpcode;
-                        astOpcode.LRegisterA = lRegisterA;
-                        astOpcode.LRegisterB = lRegisterB;
-
-                        if (unanchoredLabel != null)
-                        {
-                            astOpcode.Label = unanchoredLabel;
-                            unanchoredLabel = null;
-                        }
-
-                        astOpcode.LexTokens = lexicalTokens.GetRange(0, 4);
-                        lexicalTokens.RemoveRange(0, 4);
-
-                        partialResult.SyntaxTree.Add(astOpcode);
-                        return;
+                        astOpcode.Label = unanchoredLabel;
+                        unanchoredLabel = null;
                     }
-                    else
-                    {
-                        throw new AssemblerException();
-                    }
+
+                    astOpcode.LexTokens = lexicalTokens.GetRange(0, 4);
+                    lexicalTokens.RemoveRange(0, 4);
+
+                    partialResult.SyntaxTree.Add(astOpcode);
+                    return;
                 }
                 case OpcodeArgumentType.REG_IMMED:
                 {
-                    var nextLToken1 = lexicalTokens[1];
-                    var nextLToken2 = lexicalTokens[2];
-                    if (nextLToken1.Token == LexicalToken.Register &&
-                        nextLToken2.Token == LexicalToken.SymComma)
+                    var nextLToken1 = ExpectLToken(lexicalTokens, 1, LexicalToken.Register);
+                    var nextLToken2 = ExpectLToken(lexicalTokens, 2, LexicalToken.SymComma);
+
+                    var lRegisterA = (LToken<RegisterName>)nextLToken1;
+
+                    var astOpcode = new ASTOpcode();
+                    astOpcode.LOpcode = lOpcode;
+                    astOpcode.LRegisterA = lRegisterA;
+
+                    var immediateTokens = GetImmediateValue(lexicalTokens, 3,
+                        out astOpcode.ImmedConstant,
+                        out astOpcode.ImmedIdent);
+
+                    //if (astOpcode.ImmedIdent != null)
+                    //{
+                    //    identsRefrenced.Add(astOpcode.ImmedIdent);
+                    //}
+
+                    astOpcode.ImmedLTokens = immediateTokens;
+
+                    if (unanchoredLabel != null)
                     {
-                        var lRegisterA = (LToken<RegisterName>)nextLToken1;
-
-                        var astOpcode = new ASTOpcode();
-                        astOpcode.LOpcode = lOpcode;
-                        astOpcode.LRegisterA = lRegisterA;
-
-                        var immediateTokens = GetImmediateValue(lexicalTokens, 3,
-                            out astOpcode.ImmedConstant,
-                            out astOpcode.ImmedIdent);
-
-                        //if (astOpcode.ImmedIdent != null)
-                        //{
-                        //    identsRefrenced.Add(astOpcode.ImmedIdent);
-                        //}
-
-                        astOpcode.ImmedLTokens = immediateTokens;
-
-                        if (unanchoredLabel != null)
-                        {
-                            astOpcode.Label = unanchoredLabel;
-                            unanchoredLabel = null;
-                        }
-
-                        var len = 3 + immediateTokens.Length;
-                        astOpcode.LexTokens = lexicalTokens.GetRange(0, len);
-                        lexicalTokens.RemoveRange(0, len);
-
-                        partialResult.SyntaxTree.Add(astOpcode);
-                        return;
+                        astOpcode.Label = unanchoredLabel;
+                        unanchoredLabel = null;
                     }
-                    else
-                    {
-                        throw new AssemblerException();
-                    }
+
+                    var len = 3 + immediateTokens.Length;
+                    astOpcode.LexTokens = lexicalTokens.GetRange(0, len);
+                    lexicalTokens.RemoveRange(0, len);
+
+                    partialResult.SyntaxTree.Add(astOpcode);
+                    return;
                 }
                 case OpcodeArgumentType.REG_REG_IMMED:
                 {
-                    //lexicalTokens.RemoveRange(0, 5);
-                    //throw new NotImplementedException();
-                    var nextLToken1 = lexicalTokens[1];
-                    var nextLToken2 = lexicalTokens[2];
-                    var nextLToken3 = lexicalTokens[3];
-                    var nextLToken4 = lexicalTokens[4];
-                    if (nextLToken1.Token == LexicalToken.Register &&
-                        nextLToken2.Token == LexicalToken.SymComma &&
-                        nextLToken3.Token == LexicalToken.Register &&
-                        nextLToken4.Token == LexicalToken.SymComma)
+                    var nextLToken1 = ExpectLToken(lexicalTokens, 1, LexicalToken.Register);
+                    var nextLToken2 = ExpectLToken(lexicalTokens, 2, LexicalToken.SymComma);
+                    var nextLToken3 = ExpectLToken(lexicalTokens, 3, LexicalToken.Register);
+                    var nextLToken4 = ExpectLToken(lexicalTokens, 4, LexicalToken.SymComma);
+                    
+                    var lRegisterA = (LToken<RegisterName>)nextLToken1;
+                    var lRegisterB = (LToken<RegisterName>)nextLToken3;
+
+                    var astOpcode = new ASTOpcode();
+                    astOpcode.LOpcode = lOpcode;
+                    astOpcode.LRegisterA = lRegisterA;
+                    astOpcode.LRegisterB = lRegisterB;
+
+                    var immediateTokens = GetImmediateValue(lexicalTokens, 5,
+                        out astOpcode.ImmedConstant,
+                        out astOpcode.ImmedIdent);
+
+                    //if (astOpcode.ImmedIdent != null)
+                    //{
+                    //    identsRefrenced.Add(astOpcode.ImmedIdent);
+                    //}
+
+                    astOpcode.ImmedLTokens = immediateTokens;
+
+                    if (unanchoredLabel != null)
                     {
-                        var lRegisterA = (LToken<RegisterName>)nextLToken1;
-                        var lRegisterB = (LToken<RegisterName>)nextLToken3;
-
-                        var astOpcode = new ASTOpcode();
-                        astOpcode.LOpcode = lOpcode;
-                        astOpcode.LRegisterA = lRegisterA;
-                        astOpcode.LRegisterB = lRegisterB;
-
-                        var immediateTokens = GetImmediateValue(lexicalTokens, 5,
-                            out astOpcode.ImmedConstant,
-                            out astOpcode.ImmedIdent);
-
-                        //if (astOpcode.ImmedIdent != null)
-                        //{
-                        //    identsRefrenced.Add(astOpcode.ImmedIdent);
-                        //}
-
-                        astOpcode.ImmedLTokens = immediateTokens;
-
-                        if (unanchoredLabel != null)
-                        {
-                            astOpcode.Label = unanchoredLabel;
-                            unanchoredLabel = null;
-                        }
-
-                        var len = 5 + immediateTokens.Length;
-                        astOpcode.LexTokens = lexicalTokens.GetRange(0, len);
-                        lexicalTokens.RemoveRange(0, len);
-
-                        partialResult.SyntaxTree.Add(astOpcode);
-                        return;
+                        astOpcode.Label = unanchoredLabel;
+                        unanchoredLabel = null;
                     }
-                    else
-                    {
-                        throw new AssemblerException();
-                    }
+
+                    var len = 5 + immediateTokens.Length;
+                    astOpcode.LexTokens = lexicalTokens.GetRange(0, len);
+                    lexicalTokens.RemoveRange(0, len);
+
+                    partialResult.SyntaxTree.Add(astOpcode);
+                    return;
                 }
                 default: throw new UnknownStateException();
             }
@@ -440,6 +412,42 @@ namespace AssemblerTwo.Lib
             else
             {
                 throw new AssemblerException();
+            }
+        }
+
+        static LexicalTokenInfo ExpectLToken(List<LexicalTokenInfo> lexicalTokens, int index, LexicalToken expectType, bool shouldThrow = true)
+        {
+            if (index < lexicalTokens.Count)
+            {
+                var token = lexicalTokens[index];
+                if (token.Token == expectType)
+                {
+                    return token;
+                }
+                else
+                {
+                    var message = $"Expected {expectType} but got {token.Token}";
+                    var location = token.StringTokens[0].ToString(true, true, false);
+                    if (shouldThrow)
+                    {
+                        throw new ParserException($"{message}{Environment.NewLine}{location}", token);
+                    }
+                    else
+                    {
+                        return null;
+                    }
+                }
+            }
+            else
+            {
+                if (shouldThrow)
+                {
+                    throw new ParserException($"Expected {expectType} but got (EOS)");
+                }
+                else
+                {
+                    return null;
+                }
             }
         }
     }

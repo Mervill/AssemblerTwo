@@ -17,13 +17,108 @@ namespace AssemblerTwo.Lib
 
         public static readonly Encoding TxtEncoding = Encoding.ASCII;
 
-        public static byte[] Build(string sourceText)
+        public static BuildResult Build(string sourceText)
         {
+            var result = new BuildResult();
+            result.SourceName = string.Empty;
+
             var strTokens = StringTokenize(sourceText);
+            result.TokenizerResult = strTokens.ToArray();
+
             var lexTokens = Lex(strTokens);
-            var parseResult = Parser.Parse(lexTokens);
+            result.LexerResult = lexTokens.ToArray();
+
+            ParseResult parseResult;
+            try
+            {
+                parseResult = Parser.Parse(lexTokens);
+            }
+            catch (ParserException parserEx)
+            {
+                var firstErrorToken = parserEx.LexicalTokenInfo.StringTokens[0];
+                var firstErrorIndex = strTokens.IndexOf(firstErrorToken);
+
+                StringTokenInfo firstLineToken = null;
+                var firstSearchIndex = firstErrorIndex;
+                while (firstLineToken == null)
+                {
+                    if (strTokens[firstSearchIndex].LineCharacterIndex == 0)
+                    {
+                        firstLineToken = strTokens[firstSearchIndex];
+                    }
+                    else
+                    {
+                        firstSearchIndex--;
+                    }
+                }
+
+                StringTokenInfo lastLineToken = null;
+                var lastSearchIndex = firstErrorIndex;
+                while (lastLineToken == null)
+                {
+                    var next = lastSearchIndex + 1;
+                    if (next < strTokens.Count)
+                    {
+                        if (strTokens[next].LineIndex != firstErrorToken.LineIndex)
+                        {
+                            lastLineToken = strTokens[lastSearchIndex];
+                        }
+                        else
+                        {
+                            lastSearchIndex++;
+                        }
+                    }
+                    else
+                    {
+                        lastLineToken = strTokens[lastSearchIndex];
+                    }
+                }
+
+                var firstCharacterIndex = firstLineToken.GlobalCharacterIndex;
+                var lastCharacterIndex = lastLineToken.GlobalCharacterIndex + lastLineToken.ValueLength;
+                var lineString = sourceText.Substring(firstCharacterIndex, lastCharacterIndex - firstCharacterIndex);
+                var lineColumn = $"{firstErrorToken.LineIndex,3}|";
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine("ERROR");
+                Console.WriteLine($"{lineColumn}{lineString}");
+                Console.Write(new string(' ', lineColumn.Length + firstErrorToken.LineCharacterIndex));
+                Console.WriteLine("^");
+                Console.WriteLine(parserEx.Message);
+                Console.ResetColor();
+
+                return result;
+            }
+            result.ParseResult = parseResult;
+
             var byteGroup = GenerateBytecode(parseResult.SyntaxTree);
-            return byteGroup.Bytes;
+            result.FinalBytes = byteGroup;
+
+            return result;
+        }
+
+        /*public ParseResult ParseWithErrorWrap(List<LexicalTokenInfo> lexicalTokens)
+        {
+
+        }*/
+
+        public static BuildResult UnprotectedBuild(string sourceText, string sourceName)
+        {
+            var result = new BuildResult();
+            result.SourceName = sourceName;
+
+            var strTokens = StringTokenize(sourceText);
+            result.TokenizerResult = strTokens.ToArray();
+
+            var lexTokens = Lex(strTokens);
+            result.LexerResult = lexTokens.ToArray();
+
+            var parseResult = Parser.Parse(lexTokens);
+            result.ParseResult = parseResult;
+
+            var byteGroup = GenerateBytecode(parseResult.SyntaxTree);
+            result.FinalBytes = byteGroup;
+
+            return result;
         }
 
         #region String Tokenizer
@@ -217,14 +312,14 @@ namespace AssemblerTwo.Lib
                             lexicalTokens.Add(new LToken<string>(LexicalToken.Identifier, currentStringValue, currentStringToken));
                             continue;
                         }
-                        throw new AssemblerException();
+                        throw new UnknownStateException("Unknown State! Should have continued from the preceding statement!");
                     }
                     default:
                     {
-                        throw new AssemblerException();
+                        throw new AssemblerException($"Unhandled case {nameof(StringToken)}.{currentStringToken.Token}");
                     }
                 }
-                throw new AssemblerException();
+                throw new UnknownStateException("Unknown State! Should always continue inside preceding switch!");
             }
             return lexicalTokens;
         }
@@ -394,5 +489,13 @@ namespace AssemblerTwo.Lib
             };
         }
 
+        public class BuildResult
+        {
+            public string SourceName;
+            public StringTokenInfo[] TokenizerResult;
+            public LexicalTokenInfo[] LexerResult;
+            public ParseResult ParseResult;
+            public BytecodeGroup FinalBytes;
+        }
     }
 }

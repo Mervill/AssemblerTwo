@@ -14,8 +14,16 @@
     <ProjectReference Include="..\AssemblerTwo.VirtualMachine\AssemblerTwo.Machine.csproj" />
   </ItemGroup>
 
-  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="XCOPY &quot;$(ProjectDir)Sources\&quot; &quot;$(TargetDir)\Sources\&quot; /S /Y" />
-  </Target>
+  <ItemGroup>
+    <None Update="Sources\pangram.asm2.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Sources\print.asm2.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Sources\test.asm2.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
 
 </Project>

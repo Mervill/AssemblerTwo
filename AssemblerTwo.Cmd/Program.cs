@@ -107,10 +107,17 @@ namespace AssemblerTwo.Cmd
                         var sourceText = File.ReadAllText(o.Filename);
                         Console.WriteLine($"File: {o.Filename}");
 
-                        var bytes = Assembler.Build(sourceText);
-
-                        Console.WriteLine($"Writing {o.Output} ({bytes.Length} bytes)");
-                        File.WriteAllBytes(o.Output, bytes);
+                        var buildResult = Assembler.Build(sourceText);
+                        var bytes = buildResult.FinalBytes?.Bytes;
+                        if (bytes != null)
+                        {
+                            Console.WriteLine($"Writing {o.Output} ({bytes.Length} bytes)");
+                            File.WriteAllBytes(o.Output, bytes);
+                        }
+                        else
+                        {
+                            Console.WriteLine($"Failed to write (Assember returned no bytes!)");
+                        }
                         return;
                     }
                     case "run":

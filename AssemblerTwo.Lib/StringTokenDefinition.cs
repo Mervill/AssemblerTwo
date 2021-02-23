@@ -54,7 +54,7 @@ namespace AssemblerTwo.Lib
 #if DEBUG
             var matches = mRegex.Matches(inputString);
             if (matches.Count > 1)
-                throw new AssemblerException("Token Match Conflict!");
+                throw new AssemblerException($"{nameof(StringTokenDefinition)}: Token Match Conflict!");
 
             if (matches.Count == 0)
                 return (StringToken.Unknown, null);
@@ -62,7 +62,7 @@ namespace AssemblerTwo.Lib
             return (mToken, matches[0].Value);
 #elif RELEASE
             var match = mRegex.Match(inputString);
-            return match.Success ? (mTokenType, match.Value) : (Token.Unknown, null);
+            return match.Success ? (mToken, match.Value) : (StringToken.Unknown, null);
 #endif
         }
 
