@@ -280,13 +280,13 @@ namespace AssemblerTwo.Machine.Tests
 
             var vm = new VirtualMachine(memBus, ioBus);
             vm.Registers[0] = loadAddress;
+
             Assert.AreEqual(1, vm.StepInstruction());
             Assert.AreEqual(2, vm.ProgramCounter);
 
             Assert.AreEqual(loadValue, vm.Registers[1]);
         }
 
-        // STOR
         [Test]
         public static void Store()
         {
@@ -304,6 +304,7 @@ namespace AssemblerTwo.Machine.Tests
             var vm = new VirtualMachine(memBus, ioBus);
             vm.Registers[0] = storeValue;
             vm.Registers[1] = storeAddress;
+
             Assert.AreEqual(1, vm.StepInstruction());
             Assert.AreEqual(2, vm.ProgramCounter);
 
@@ -331,6 +332,7 @@ namespace AssemblerTwo.Machine.Tests
             var ioBus = new EmptyIOBus();
 
             var vm = new VirtualMachine(memBus, ioBus);
+
             Assert.AreEqual(2, vm.StepInstruction());
             Assert.AreEqual(4, vm.ProgramCounter);
 
@@ -379,7 +381,30 @@ namespace AssemblerTwo.Machine.Tests
             Assert.AreEqual(jumpAddress, vm.ProgramCounter);
         }
 
-        // CALL
+        [Test]
+        public static void Call()
+        {
+            const int progamBase  = 0x0005;
+            const int stackOrigin = 0x000F;
+            const int callTarget  = 0xF00D;
+
+            var opcodeBuilder = new OpcodeBuilder();
+            opcodeBuilder.Append(Opcode.CALL, immed: callTarget);
+
+            var memBus = new DefaultMemoryBus();
+            memBus.CopyInto(opcodeBuilder.GetBytes(), progamBase);
+
+            var ioBus = new EmptyIOBus();
+
+            var vm = new VirtualMachine(memBus, ioBus);
+            vm.ProgramCounter = progamBase;
+            vm.StackPointer = stackOrigin;
+
+            Assert.AreEqual(2, vm.StepInstruction());
+            Assert.AreEqual(callTarget, vm.ProgramCounter);
+            Assert.AreEqual(stackOrigin - 2, vm.StackPointer);
+            Assert.AreEqual(progamBase + 4, memBus.Read16(vm.StackPointer));
+        }
 
         // RET
 
@@ -395,6 +420,7 @@ namespace AssemblerTwo.Machine.Tests
             var ioBus = new EmptyIOBus();
 
             var vm = new VirtualMachine(memBus, ioBus);
+            
             Assert.AreEqual(1, vm.StepInstruction());
             Assert.AreEqual(2, vm.ProgramCounter);
 
