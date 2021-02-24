@@ -266,9 +266,12 @@ namespace AssemblerTwo.Machine.Tests
         [Test]
         public static void Load()
         {
+            const ushort loadValue   = 0xF00D;
+            const ushort loadAddress = 0x0002;
+
             var opcodeBuilder = new OpcodeBuilder();
             opcodeBuilder.Append(Opcode.LOAD, RegisterName.A, RegisterName.B);
-            opcodeBuilder.Append(0xF0, 0x0D);
+            opcodeBuilder.Append((loadValue >> 8), (loadValue & 0xFF));
             
             var memBus = new DefaultMemoryBus();
             memBus.CopyInto(opcodeBuilder.GetBytes(), 0);
@@ -276,14 +279,37 @@ namespace AssemblerTwo.Machine.Tests
             var ioBus = new EmptyIOBus();
 
             var vm = new VirtualMachine(memBus, ioBus);
-            vm.Registers[0] = 0x0002;
+            vm.Registers[0] = loadAddress;
             Assert.AreEqual(1, vm.StepInstruction());
             Assert.AreEqual(2, vm.ProgramCounter);
 
-            Assert.AreEqual(vm.Registers[1], 0xF00D);
+            Assert.AreEqual(loadValue, vm.Registers[1]);
         }
 
         // STOR
+        [Test]
+        public static void Store()
+        {
+            const ushort storeValue   = 0xF00D;
+            const ushort storeAddress = 0x0002;
+
+            var opcodeBuilder = new OpcodeBuilder();
+            opcodeBuilder.Append(Opcode.STOR, RegisterName.A, RegisterName.B);
+            
+            var memBus = new DefaultMemoryBus();
+            memBus.CopyInto(opcodeBuilder.GetBytes(), 0);
+
+            var ioBus = new EmptyIOBus();
+
+            var vm = new VirtualMachine(memBus, ioBus);
+            vm.Registers[0] = storeValue;
+            vm.Registers[1] = storeAddress;
+            Assert.AreEqual(1, vm.StepInstruction());
+            Assert.AreEqual(2, vm.ProgramCounter);
+
+            Assert.AreEqual(storeValue, memBus.Read16(storeAddress));
+        }
+
         // RXR  (above?)
         // RXM  (above?)
         // HI   (above)
@@ -291,12 +317,48 @@ namespace AssemblerTwo.Machine.Tests
 
         // IN
 
-        // COPYI
+        [Test]
+        public static void CopyImmediate()
+        {
+            const ushort immedValue = 0xF00D;
+
+            var opcodeBuilder = new OpcodeBuilder();
+            opcodeBuilder.Append(Opcode.COPYI, RegisterName.B, immed: immedValue);
+            
+            var memBus = new DefaultMemoryBus();
+            memBus.CopyInto(opcodeBuilder.GetBytes(), 0);
+
+            var ioBus = new EmptyIOBus();
+
+            var vm = new VirtualMachine(memBus, ioBus);
+            Assert.AreEqual(2, vm.StepInstruction());
+            Assert.AreEqual(4, vm.ProgramCounter);
+
+            Assert.AreEqual(immedValue, vm.Registers[1]);
+        }
 
         // INI
         // OUTI
 
-        // JUMPR
+        [Test]
+        public static void JumpRegister()
+        {
+            const ushort jumpAddress = 0xF00D;
+
+            var opcodeBuilder = new OpcodeBuilder();
+            opcodeBuilder.Append(Opcode.JUMPR, RegisterName.B);
+
+            var memBus = new DefaultMemoryBus();
+            memBus.CopyInto(opcodeBuilder.GetBytes(), 0);
+
+            var ioBus = new EmptyIOBus();
+
+            var vm = new VirtualMachine(memBus, ioBus);
+            vm.Registers[1] = jumpAddress;
+
+            Assert.AreEqual(1, vm.StepInstruction());
+            Assert.AreEqual(jumpAddress, vm.ProgramCounter);
+        }
 
         [Test]
         public static void Jump()
