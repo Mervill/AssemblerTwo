@@ -435,6 +435,7 @@ namespace AssemblerTwo.Machine.Tests
         public static void Push()
         {
             const int stackOrigin = 0xFFFF;
+            const int stackValue  = 0xF00D;
 
             var opcodeBuilder = new OpcodeBuilder();
             opcodeBuilder.Append(Opcode.PUSH, RegisterName.B);
@@ -446,20 +447,21 @@ namespace AssemblerTwo.Machine.Tests
 
             var vm = new VirtualMachine(memBus, ioBus);
             vm.StackPointer = stackOrigin;
-            vm.Registers[1] = 0xF00D;
+            vm.Registers[1] = stackValue;
 
             Assert.AreEqual(1, vm.StepInstruction());
             Assert.AreEqual(2, vm.ProgramCounter);
             Assert.AreEqual(stackOrigin - 2, vm.StackPointer);
             //Assert.AreEqual(0xF0, memBus.Read(stackOrigin - 2));
             //Assert.AreEqual(0x0D, memBus.Read(stackOrigin - 1));
-            Assert.AreEqual(0xF00D, memBus.Read16(stackOrigin - 2));
+            Assert.AreEqual(stackValue, memBus.Read16(stackOrigin - 2));
         }
 
         [Test]
         public static void Pop()
         {
             const int stackOrigin = 0xFFFF;
+            const int stackValue  = 0xF00D;
 
             var opcodeBuilder = new OpcodeBuilder();
             opcodeBuilder.Append(Opcode.POP, RegisterName.B);
@@ -468,7 +470,7 @@ namespace AssemblerTwo.Machine.Tests
             memBus.CopyInto(opcodeBuilder.GetBytes(), 0);
             //memBus.Write(0xFFFE, 0xF0);
             //memBus.Write(0xFFFF, 0x0D);
-            memBus.Write16(stackOrigin - 2, 0xF00D);
+            memBus.Write16(stackOrigin - 2, stackValue);
 
             var ioBus = new EmptyIOBus();
 
@@ -478,7 +480,7 @@ namespace AssemblerTwo.Machine.Tests
             Assert.AreEqual(1, vm.StepInstruction());
             Assert.AreEqual(2, vm.ProgramCounter);
             Assert.AreEqual(stackOrigin, vm.StackPointer);
-            Assert.AreEqual(vm.Registers[1], 0xF00D);
+            Assert.AreEqual(vm.Registers[1], stackValue);
         }
 
         // OUT
