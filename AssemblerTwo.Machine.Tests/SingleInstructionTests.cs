@@ -13,6 +13,16 @@ namespace AssemblerTwo.Machine.Tests
     [TestFixture]
     public static class SingleInstructionTests
     {
+        // This file should contain a single test for each opcode in the instruction set.
+        // Exhasustive tests of paticular instructions should go in other files. 
+        //
+        // For each opcode test in this file:
+        // - Assert the expected state of _modified_ registers.
+        //   - Don't assert the state of registers or memory that is used but not
+        //     modified by an opcode.
+        // - Assert the expected final position of the Progam Counter
+        // - Assert StepInstruction returns the correct cycle count for the opcode
+
         [TestCase(Opcode.ADD, 2, 3, 5)]
         [TestCase(Opcode.SUB, 7, 2, 5)]
         [TestCase(Opcode.MUL, 2, 3, 6)]
@@ -46,7 +56,6 @@ namespace AssemblerTwo.Machine.Tests
             Assert.AreEqual(1, vm.StepInstruction());
             Assert.AreEqual(2, vm.ProgramCounter);
 
-            Assert.AreEqual(valueA & 0xFFFF, vm.Registers[0]);
             Assert.AreEqual(result, vm.Registers[1]);
         }
 
@@ -252,6 +261,88 @@ namespace AssemblerTwo.Machine.Tests
             Assert.AreEqual(assertAddress, vm.ProgramCounter);
         }
 
+        // COPY (above)
+
+        [Test]
+        public static void Load()
+        {
+            var opcodeBuilder = new OpcodeBuilder();
+            opcodeBuilder.Append(Opcode.LOAD, RegisterName.A, RegisterName.B);
+            opcodeBuilder.Append(0xF0, 0x0D);
+            
+            var memBus = new DefaultMemoryBus();
+            memBus.CopyInto(opcodeBuilder.GetBytes(), 0);
+
+            var ioBus = new EmptyIOBus();
+
+            var vm = new VirtualMachine(memBus, ioBus);
+            vm.Registers[0] = 0x0002;
+            Assert.AreEqual(1, vm.StepInstruction());
+            Assert.AreEqual(2, vm.ProgramCounter);
+
+            Assert.AreEqual(vm.Registers[1], 0xF00D);
+        }
+
+        // STOR
+        // RXR  (above?)
+        // RXM  (above?)
+        // HI   (above)
+        // LO   (above)
+
+        // IN
+
+        // COPYI
+
+        // INI
+        // OUTI
+
+        // JUMPR
+
+        [Test]
+        public static void Jump()
+        {
+            const ushort jumpAddress = 0xF00D;
+
+            var opcodeBuilder = new OpcodeBuilder();
+            opcodeBuilder.Append(Opcode.JUMP, immed: jumpAddress);
+
+            var memBus = new DefaultMemoryBus();
+            memBus.CopyInto(opcodeBuilder.GetBytes(), 0);
+
+            var ioBus = new EmptyIOBus();
+
+            var vm = new VirtualMachine(memBus, ioBus);
+            
+            Assert.AreEqual(2, vm.StepInstruction());
+            Assert.AreEqual(jumpAddress, vm.ProgramCounter);
+        }
+
+        // CALL
+
+        // RET
+
+        [Test]
+        public static void Halt()
+        {
+            var opcodeBuilder = new OpcodeBuilder();
+            opcodeBuilder.Append(Opcode.HALT);
+
+            var memBus = new DefaultMemoryBus();
+            memBus.CopyInto(opcodeBuilder.GetBytes(), 0);
+
+            var ioBus = new EmptyIOBus();
+
+            var vm = new VirtualMachine(memBus, ioBus);
+            Assert.AreEqual(1, vm.StepInstruction());
+            Assert.AreEqual(2, vm.ProgramCounter);
+
+            Assert.AreEqual(true, vm.IsHalted);
+        }
+
+        // EI
+
+        // DI
+
         [Test]
         public static void Push()
         {
@@ -301,5 +392,7 @@ namespace AssemblerTwo.Machine.Tests
             Assert.AreEqual(stackOrigin, vm.StackPointer);
             Assert.AreEqual(vm.Registers[1], 0xF00D);
         }
+
+        // OUT
     }
 }

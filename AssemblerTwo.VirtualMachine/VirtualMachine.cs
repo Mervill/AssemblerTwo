@@ -608,7 +608,7 @@ namespace AssemblerTwo.Machine
                                 {
                                     // JUMP (JUMPI)
                                     ProgramCounter = MemoryRead(ProgramCounter);
-                                    return 1;
+                                    return 2;
                                 }
                                 case 0xB:
                                 {

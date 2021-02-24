@@ -141,8 +141,8 @@ QUESTIONS:
 	0xA ->
 		0x0 SYSCALL [i:value]
 		0x1 SYSRET
-		0x2 POP.R
-		0x3 PUSH.R
+		0x2 ?? POP.R
+		0x3 ?? PUSH.R
 		0x4 ?? PUSH.I [immediate]
 		0x5 ?? CONT
 		0x6 ?? YIELD [YIELD CODE]
@@ -159,7 +159,7 @@ QUESTIONS:
 	0xC PUSH    r1
 	0xD POP     r1
 	0xE INTE    r1 // ?
-	0xF CPUID   r1
+	0xF ?? CPUID   r1
 0xF OUT     r1 r2
 
 [ 0xE ]
