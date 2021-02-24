@@ -347,7 +347,7 @@ namespace AssemblerTwo.Lib
                             var putNumberToken = ((LToken<uint>)nextLToken1);
 
                             var astBinary = new ASTBinary();
-                            astBinary.Bytes = BitConverter.GetBytes(putNumberToken.Value).Reverse().ToArray();
+                            astBinary.Bytes = BitConverter.GetBytes((ushort)putNumberToken.Value).Reverse().ToArray();
 
                             if (unanchoredLabel != null)
                             {

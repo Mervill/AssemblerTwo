@@ -181,13 +181,13 @@ namespace AssemblerTwo.Machine
                         case 0x9:
                         {
                             // SHL
-                            Registers[regB] = Registers[regA] >> Registers[regB];
+                            Registers[regB] = Registers[regA] << Registers[regB];
                             return 1;
                         }
                         case 0xA:
                         {
                             // SHR
-                            Registers[regB] = Registers[regA] << Registers[regB];
+                            Registers[regB] = Registers[regA] >> Registers[regB];
                             return 1;
                         }
                         case 0xB:
@@ -264,13 +264,13 @@ namespace AssemblerTwo.Machine
                         case 0x9:
                         {
                             // SHLI
-                            Registers[regA] = Registers[regA] >> FetchAndAdvance();
+                            Registers[regA] = Registers[regA] << FetchAndAdvance();
                             return 2;
                         }
                         case 0xA:
                         {
                             // SHRI
-                            Registers[regA] = Registers[regA] << FetchAndAdvance();
+                            Registers[regA] = Registers[regA] >> FetchAndAdvance();
                             return 2;
                         }
                         case 0xB:

@@ -39,7 +39,6 @@ QUESTIONS:
 - Remove Conditional Calling? (CLT, CLTE, etc)
 - Need to replace pow with Signed Modulus?
 - Do we even need POW at all?
-- Conditional call not required?
 - Above / Below required (pretty sure yes)
 
 [0xA]
@@ -52,8 +51,8 @@ QUESTIONS:
 0x6 AND     r1 r2   Bitwise AND           r2 = r1 & r2
 0x7 OR      r1 r2   Bitwise OR            r2 = r1 | r2
 0x8 XOR     r1 r2   Bitwise XOR           r2 = r1 ^ r2
-0x9 SHL     r1 r2   Bitwise Shift Left    r2 = r1 >> r2
-0xA SHR     r1 r2   Bitwise Shift Right   r2 = r1 << r2
+0x9 SHL     r1 r2   Bitwise Shift Left    r2 = r1 << r2
+0xA SHR     r1 r2   Bitwise Shift Right   r2 = r1 >> r2
 0xB POW     r1 r2
 0xC ??
 0xD ??
