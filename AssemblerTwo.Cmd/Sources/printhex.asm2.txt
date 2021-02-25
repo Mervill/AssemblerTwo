@@ -1,0 +1,44 @@
+;
+; Hex Print Test
+;
+        NAME    "Hex Print"
+        
+        COPYI   S,0xFFFF
+        COPYI   P,TESTW
+        LOAD    P,P
+        CALL    PHEXS
+        HALT
+
+TESTW:  PUT     0x09AF;
+
+;REGION Print Hex
+PHEXS:  COPYI   L,16
+PHEXSL: SUBI    L,4      ; L = L - 4
+        COPY    P,M      ; M = P
+        COPY    L,N      ; N = L
+        SHR     M,N      ; N = M >> N
+        ANDI    N,0xF    ; N = N & 0xF
+        COPYI   B,0xA    ; B = 0xA
+        JGTE    N,B,HEXL ; N >= B, HEXL
+        ; If the current hex digit is less then 0xA (10) then add 0x30 (hex base
+        ; of the number characters) to the value of the digit to get the correct
+        ; ascii character code
+        ADDI    N,0x30   ; N = N + 0x30
+        COPY    N,A      ; A = N
+        OUTI    A,0x0A
+        REZ     L
+        JUMP    PHEXSL
+
+        ; If the current hex digit is greater than 0xA (10) first subtract
+        ; 10 from the real value of the digit, then add 0x41 (hex base of the
+        ; letter characters) to get the correct ascii character code
+HEXL:   SUBI    N,0xA
+        ADDI    N,0x41
+        COPY    N,A
+        OUTI    A,0x0A
+        REZ     L
+        JUMP    PHEXSL
+;ENDREGION
+
+        HALT
+;       END

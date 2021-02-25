@@ -21,7 +21,10 @@
     <None Update="Sources\print.asm2.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="Sources\printbits.asm2.txt">
+    <None Update="Sources\printbin.asm2.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Sources\printhex.asm2.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="Sources\test.asm2.txt">

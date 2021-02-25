@@ -1,35 +1,29 @@
 ;
 ; Binary Print Test
 ;
-;   0x30 - 0
-;   0x39 - 9
-;
         NAME    "Binary Print"
         
         COPYI   S,0xFFFF
         COPYI   P,TESTW
         LOAD    P,P
-        CALL    PBITS
+        CALL    PBINS
         HALT
 
 TESTW:  PUT     0xABCD;
 
-PBITS:  COPYI   L,16
-PBITSL: DEC     L       ; L--
+;REGION Print Bits
+PBINS:  COPYI   L,16
+PBINSL: DEC     L       ; L--
         COPY    P,M     ; M = P
         COPY    L,N     ; N = L
         SHR     M,N     ; N = M >> N
         ANDI    N,1     ; N = N & 1 
-        JEZ     N,BZERO ;
-
-        COPYI   A,0x31  ; '1'
+        ADDI    N,0x30  ; N = N + 0x30
+        COPY    N,A     ; A = N
         OUTI    A,0x0A
         REZ     L
-        JUMP    PBITSL
-
-BZERO:  COPYI   A,0x30  ; '0'
-        OUTI    A,0x0A
-        REZ     L
-        JUMP    PBITSL
+        JUMP    PBINSL
+;ENDREGION
 
         HALT
+;       END
