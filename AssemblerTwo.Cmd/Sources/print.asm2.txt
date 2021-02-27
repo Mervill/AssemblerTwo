@@ -12,6 +12,8 @@
 TXT:    PUT      "Custom Assembly Language\0"
 
 ;REGION MSG
+; Routine to print a null-terminated string, the first address
+; of the string is passed as an argument via the P register
 MSG:    LOAD    P,M   ; Load the word at `P` into `M`
         HI      M,N   ; Put HI byte of `M` into `N`
         REZ     N     ; If `N` equals 0, return (we're done)

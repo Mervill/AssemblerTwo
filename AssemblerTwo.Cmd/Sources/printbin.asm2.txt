@@ -12,7 +12,7 @@
 TESTW:  PUT     0xABCD;
 
 ;REGION Print Bits
-PBINS:  COPYI   L,16
+PBINS:  COPYI   L,16    ; L = 16
 PBINSL: DEC     L       ; L--
         COPY    P,M     ; M = P
         COPY    L,N     ; N = L

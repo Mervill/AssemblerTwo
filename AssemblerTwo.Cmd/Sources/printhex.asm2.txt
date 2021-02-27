@@ -12,7 +12,7 @@
 TESTW:  PUT     0x09AF;
 
 ;REGION Print Hex
-PHEXS:  COPYI   L,16
+PHEXS:  COPYI   L,16     ; L = 16
 PHEXSL: SUBI    L,4      ; L = L - 4
         COPY    P,M      ; M = P
         COPY    L,N      ; N = L
