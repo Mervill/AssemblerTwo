@@ -141,11 +141,12 @@ namespace AssemblerTwo.Machine
                         }
                         case 0x3:
                         {
-                            //DIV
-                            throw new NotImplementedException();
-                            //Registers[regB] = Registers[regA] / Registers[regB];
-                            //return 1;
-
+                            // DIV
+                            int dividend = Registers[regA];
+                            int divisor  = Registers[regB];
+                            int quotient = dividend / divisor;
+                            Registers[regB] = quotient;
+                            return 1;
                         }
                         case 0x4:
                         {

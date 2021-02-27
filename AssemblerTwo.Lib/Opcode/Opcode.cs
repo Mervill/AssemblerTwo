@@ -10,7 +10,7 @@ namespace AssemblerTwo.Lib
         ADD   = 0xA000,
         SUB   = 0xA100,
         MUL   = 0xA200,
-        //DIV   = 0xA300,
+        DIV   = 0xA300,
         //DIVS  = 0xA400,
         MOD   = 0xA500,
         AND   = 0xA600,
