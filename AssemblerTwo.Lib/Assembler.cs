@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Globalization;
+using System.IO;
 
 namespace AssemblerTwo.Lib
 {
@@ -80,7 +81,7 @@ namespace AssemblerTwo.Lib
                 var lineColumn = $"{firstErrorToken.LineIndex,3}|";
                 Console.ForegroundColor = ConsoleColor.Red;
                 Console.WriteLine("ERROR");
-                Console.WriteLine($"{lineColumn}{lineString}");
+                Console.Write($"{lineColumn}{lineString}");
                 Console.Write(new string(' ', lineColumn.Length + firstErrorToken.LineCharacterIndex));
                 Console.WriteLine("^");
                 Console.WriteLine(parserEx.Message);
@@ -90,7 +91,7 @@ namespace AssemblerTwo.Lib
             }
             result.ParseResult = parseResult;
 
-            var byteGroup = GenerateBytecode(parseResult.SyntaxTree);
+            var byteGroup = GenerateBytecode(parseResult.SyntaxTree, true, true);
             result.FinalBytes = byteGroup;
 
             return result;
@@ -115,7 +116,7 @@ namespace AssemblerTwo.Lib
             var parseResult = Parser.Parse(lexTokens);
             result.ParseResult = parseResult;
 
-            var byteGroup = GenerateBytecode(parseResult.SyntaxTree);
+            var byteGroup = GenerateBytecode(parseResult.SyntaxTree, true, true);
             result.FinalBytes = byteGroup;
 
             return result;
@@ -324,7 +325,7 @@ namespace AssemblerTwo.Lib
             return lexicalTokens;
         }
 
-        public static BytecodeGroup GenerateBytecode(List<ASTNode> astNodes)
+        public static BytecodeGroup GenerateBytecode(List<ASTNode> astNodes, bool generateSymbolTable, bool symbolTableDebugMode)
         {
             var totalBytes = 0;
             var labelDefines = new Dictionary<string, int>();
@@ -480,12 +481,71 @@ namespace AssemblerTwo.Lib
                 }
             }
 
+            SymbolTable symbolTable = null;
+            if (generateSymbolTable)
+            {
+                symbolTable = GenerateSymbolTable(labelDefines, labelRefs, symbolTableDebugMode);
+            }
+
             return new BytecodeGroup
             {
                 LabelDefines = labelDefines,
                 LabelRefs = labelRefs,
                 RelocationIndicies = relocationIndicies,
+                SymbolTable = symbolTable,
                 Bytes = finalBytes,
+            };
+        }
+
+        private static SymbolTable GenerateSymbolTable(Dictionary<string, int> labelDefines, Dictionary<string, List<int>> labelRefs, bool preserveNames)
+        {
+            var newSymbolTable = new SymbolTable();
+
+            var labelDefinePairs = labelDefines.ToArray();
+            var labelReferencePairs = labelRefs.ToArray();
+
+            ushort[] symbolDefineAddresses = new ushort[labelDefinePairs.Length];
+            for (int x = 0; x < labelDefinePairs.Length; x++)
+            {
+                symbolDefineAddresses[x] = (ushort)labelDefinePairs[x].Value;
+            }
+
+            ushort[][] nonExternalReferenceAddresses = new ushort[labelReferencePairs.Length][];
+            for (int x = 0; x < labelReferencePairs.Length; x++)
+            {
+                var references = labelReferencePairs[x].Value;
+                if (references != null)
+                {
+                    var shortsArray = references.Select(x => (ushort)x).ToArray();
+                    nonExternalReferenceAddresses[x] = shortsArray;
+                }
+                else
+                {
+                    nonExternalReferenceAddresses[x] = Array.Empty<ushort>();
+                }
+            }
+
+            string[] symbolDefineNames = Array.Empty<string>();
+            if (preserveNames)
+            {
+                symbolDefineNames = new string[labelDefinePairs.Length];
+                for (int x = 0; x < labelDefinePairs.Length; x++)
+                {
+                    symbolDefineNames[x] = labelDefinePairs[x].Key;
+                }
+            }
+
+            var flag = (preserveNames) ? SymbolTable.DebugFlag : SymbolTable.ReleaseFlag;
+
+            return new SymbolTable
+            {
+                Flag = flag,
+                SymbolDefineAddresses = symbolDefineAddresses,
+                NonExternalReferenceAddresses = nonExternalReferenceAddresses,
+                ExternalSymbols = Array.Empty<ExternalSymbol>(),
+                PublicSymbols = Array.Empty<PublicSymbol>(),
+                ExtraDeltaAddresses = Array.Empty<ushort>(),
+                SymbolDefineNames = symbolDefineNames,
             };
         }
 

@@ -103,6 +103,9 @@ namespace AssemblerTwo.Lib
                 }
             }
 
+            partialResult.LabelsDefined = identsDefined;
+            partialResult.LabelsRefrenced = identsRefrenced;
+
             return partialResult;
         }
 

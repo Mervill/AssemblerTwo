@@ -98,7 +98,18 @@ namespace AssemblerTwo.Cmd
                         var dumpText = DumpUtility.DumpASTNodes(parseResult.SyntaxTree, true, true);
                         Console.Write(dumpText);
                         string outFilename = "./dump-ast.output.txt";
-                        Console.WriteLine($"Writing {outFilename} ({Encoding.UTF8.GetByteCount(sourceText)} bytes)");
+                        Console.WriteLine($"Writing {outFilename} ({Encoding.UTF8.GetByteCount(dumpText)} bytes)");
+                        File.WriteAllText(outFilename, dumpText);
+                        return;
+                    }
+                    case "dump-st":
+                    {
+                        var symbolTable = SymbolTable.FromFile(o.Filename);
+                        Console.WriteLine($"File: {o.Filename}");
+                        var dumpText = symbolTable.GetDump();
+                        Console.Write(dumpText);
+                        string outFilename = "./dump-st.output.txt";
+                        Console.WriteLine($"Writing {outFilename} ({Encoding.UTF8.GetByteCount(dumpText)} bytes)");
                         File.WriteAllText(outFilename, dumpText);
                         return;
                     }
@@ -153,18 +164,34 @@ namespace AssemblerTwo.Cmd
                         Console.WriteLine("Parse...");
                         var parseResult = Parser.Parse(lexTokens);
 
+                        if (parseResult.NameDirectiveToken != null)
+                        {
+                            Console.WriteLine($"AST Name: {parseResult.NameDirectiveToken.Value}");
+                        }
+                        
                         Console.WriteLine("AST Nodes:");
                         Console.Write(DumpUtility.DumpASTNodes(parseResult.SyntaxTree, true, true));
                         
                         Console.WriteLine("GenerateBytecode...");
-                        var byteGroup = Assembler.GenerateBytecode(parseResult.SyntaxTree);
+                        var byteGroup = Assembler.GenerateBytecode(parseResult.SyntaxTree, true, true);
 
                         Console.WriteLine("Bytecode:");
                         var bytes = byteGroup.Bytes;
                         Console.WriteLine(DumpUtility.DumpBytes(byteGroup.Bytes));
 
-                        Console.WriteLine("Label Data:");
-                        Console.Write(byteGroup.SerializeLabelData());
+                        Console.WriteLine("DumpSymbolTable:");
+                        Console.Write(byteGroup.SymbolTable.GetDump(true));
+
+                        var symbolTableBytes = byteGroup.SymbolTable.GetBytes();
+                        //Console.WriteLine("Symbol Table Bytes:");
+                        //Console.WriteLine(DumpUtility.DumpBytes(symbolTableBytes));
+
+                        const string symbolTableFilename = "out.st";
+                        Console.WriteLine($"Writing {symbolTableFilename} ({symbolTableBytes.Length} bytes)...");
+                        File.WriteAllBytes(symbolTableFilename, symbolTableBytes);
+
+                        //var symbolTable2 = SymbolTable.FromFile(symbolTableFilename);
+                        //Console.Write(symbolTable2.GetDump());
 
                         Console.WriteLine($"Writing {o.Output} ({bytes.Length} bytes)...");
                         File.WriteAllBytes(o.Output, bytes);
@@ -207,15 +234,18 @@ namespace AssemblerTwo.Cmd
 
         static void RunVirtualMachine(string filename)
         {
+            const short baseAddress = 0x0000;
+
             var bytes = File.ReadAllBytes(filename);
             Console.WriteLine($"Running {Path.GetFileName(filename)} ({bytes.Length} bytes)");
 
             var memBus = new DefaultMemoryBus();
-            memBus.CopyInto(bytes, 0);
+            memBus.CopyInto(bytes, baseAddress);
 
             var ioBus = new DefaultIOBus(Console.Write);
 
             var vm = new VirtualMachine(memBus, ioBus);
+            vm.ProgramCounter = baseAddress;
 
             int totalSteps = 0;
             while (!vm.IsHalted)

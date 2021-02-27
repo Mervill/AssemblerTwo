@@ -25,7 +25,7 @@ PHEXSL: SUBI    L,4      ; L = L - 4
         ; ascii character code
         ADDI    N,0x30   ; N = N + 0x30
         COPY    N,A      ; A = N
-        OUTI    A,0x0A
+        OUTI    A,0x0A   ; A -> Out (0xA)
         REZ     L
         JUMP    PHEXSL
 

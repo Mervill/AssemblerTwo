@@ -20,7 +20,7 @@ PBINSL: DEC     L       ; L--
         ANDI    N,1     ; N = N & 1 
         ADDI    N,0x30  ; N = N + 0x30
         COPY    N,A     ; A = N
-        OUTI    A,0x0A
+        OUTI    A,0x0A  ; A -> Out (0xA)
         REZ     L
         JUMP    PBINSL
 ;ENDREGION

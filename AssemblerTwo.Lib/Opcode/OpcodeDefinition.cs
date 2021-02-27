@@ -3,92 +3,102 @@ using System.Collections;
 
 namespace AssemblerTwo.Lib
 {
+    using OP = Opcode;
+    
     public class OpcodeDefinition
     {
+        const OpcodeArgumentType N   = OpcodeArgumentType.NONE;
+        const OpcodeArgumentType R   = OpcodeArgumentType.REG;
+        const OpcodeArgumentType I   = OpcodeArgumentType.IMMED;
+        const OpcodeArgumentType RR  = OpcodeArgumentType.REG_REG;
+        const OpcodeArgumentType RI  = OpcodeArgumentType.REG_IMMED;
+        const OpcodeArgumentType RRI = OpcodeArgumentType.REG_REG_IMMED;
+        
         private static readonly OpcodeDefinition[] Table = new OpcodeDefinition[]
         {
-            new (Opcode.ADD,   OpcodeArgumentType.REG_REG),
-            new (Opcode.SUB,   OpcodeArgumentType.REG_REG),
-            new (Opcode.MUL,   OpcodeArgumentType.REG_REG),
-            new (Opcode.MOD,   OpcodeArgumentType.REG_REG),
-            new (Opcode.AND,   OpcodeArgumentType.REG_REG),
-            new (Opcode.OR,    OpcodeArgumentType.REG_REG),
-            new (Opcode.XOR,   OpcodeArgumentType.REG_REG),
-            new (Opcode.SHL,   OpcodeArgumentType.REG_REG),
-            new (Opcode.SHR,   OpcodeArgumentType.REG_REG),
-            new (Opcode.ADDI,  OpcodeArgumentType.REG_IMMED),
-            new (Opcode.SUBI,  OpcodeArgumentType.REG_IMMED),
-            new (Opcode.MULI,  OpcodeArgumentType.REG_IMMED),
-            new (Opcode.MODI,  OpcodeArgumentType.REG_IMMED),
-            new (Opcode.ANDI,  OpcodeArgumentType.REG_IMMED),
-            new (Opcode.ORI,   OpcodeArgumentType.REG_IMMED),
-            new (Opcode.XORI,  OpcodeArgumentType.REG_IMMED),
-            new (Opcode.SHLI,  OpcodeArgumentType.REG_IMMED),
-            new (Opcode.SHRI,  OpcodeArgumentType.REG_IMMED),
-            new (Opcode.INC,   OpcodeArgumentType.REG),
-            new (Opcode.DEC,   OpcodeArgumentType.REG),
-            new (Opcode.NOT,   OpcodeArgumentType.REG),
-            new (Opcode.NEG,   OpcodeArgumentType.REG),
-            new (Opcode.JLT,   OpcodeArgumentType.REG_REG_IMMED),
-            new (Opcode.JLTE,  OpcodeArgumentType.REG_REG_IMMED),
-            new (Opcode.JGT,   OpcodeArgumentType.REG_REG_IMMED),
-            new (Opcode.JGTE,  OpcodeArgumentType.REG_REG_IMMED),
-            new (Opcode.JB,    OpcodeArgumentType.REG_REG_IMMED),
-            new (Opcode.JBE,   OpcodeArgumentType.REG_REG_IMMED),
-            new (Opcode.JA,    OpcodeArgumentType.REG_REG_IMMED),
-            new (Opcode.JAE,   OpcodeArgumentType.REG_REG_IMMED),
-            new (Opcode.JEQ,   OpcodeArgumentType.REG_REG_IMMED),
-            new (Opcode.JNEQ,  OpcodeArgumentType.REG_REG_IMMED),
-            new (Opcode.RLT,   OpcodeArgumentType.REG_REG),
-            new (Opcode.RLTE,  OpcodeArgumentType.REG_REG),
-            new (Opcode.RGT,   OpcodeArgumentType.REG_REG),
-            new (Opcode.RGTE,  OpcodeArgumentType.REG_REG),
-            new (Opcode.RB,    OpcodeArgumentType.REG_REG),
-            new (Opcode.RBE,   OpcodeArgumentType.REG_REG),
-            new (Opcode.RA,    OpcodeArgumentType.REG_REG),
-            new (Opcode.RAE,   OpcodeArgumentType.REG_REG),
-            new (Opcode.REQ,   OpcodeArgumentType.REG_REG),
-            new (Opcode.RNEQ,  OpcodeArgumentType.REG_REG),
-            new (Opcode.COPY,  OpcodeArgumentType.REG_REG),
-            new (Opcode.LOAD,  OpcodeArgumentType.REG_REG),
-            new (Opcode.STOR,  OpcodeArgumentType.REG_REG),
-            new (Opcode.RXR,   OpcodeArgumentType.REG_REG),
-            new (Opcode.RXM,   OpcodeArgumentType.REG_REG),
-            new (Opcode.HI,    OpcodeArgumentType.REG_REG),
-            new (Opcode.LO,    OpcodeArgumentType.REG_REG),
-            new (Opcode.IN,    OpcodeArgumentType.REG_REG),
-            new (Opcode.COPYI, OpcodeArgumentType.REG_IMMED),
-            new (Opcode.INI,   OpcodeArgumentType.REG_IMMED),
-            new (Opcode.OUTI,  OpcodeArgumentType.REG_IMMED),
-            new (Opcode.SHAL,  OpcodeArgumentType.REG_IMMED),
-            new (Opcode.SHAR,  OpcodeArgumentType.REG_IMMED),
-            new (Opcode.JUMPR, OpcodeArgumentType.REG),
-            //new (Opcode.SYSCALL, OpcodeArgumentType.NONE),
-            //new (Opcode.SYSRET, OpcodeArgumentType.NONE),
-            new (Opcode.POPR,  OpcodeArgumentType.NONE),
-            new (Opcode.PUSHR, OpcodeArgumentType.NONE),
-            new (Opcode.JUMP,  OpcodeArgumentType.IMMED),
-            new (Opcode.CALL,  OpcodeArgumentType.IMMED),
-            new (Opcode.RET,   OpcodeArgumentType.NONE),
-            new (Opcode.HALT,  OpcodeArgumentType.NONE),
-            new (Opcode.EI,    OpcodeArgumentType.NONE),
-            new (Opcode.DI,    OpcodeArgumentType.NONE),
-            new (Opcode.CALLR, OpcodeArgumentType.REG),
-            new (Opcode.PUSH,  OpcodeArgumentType.REG),
-            new (Opcode.POP,   OpcodeArgumentType.REG),
-            //new (Opcode.INTE,  OpcodeArgumentType.REG),
-            new (Opcode.OUT,   OpcodeArgumentType.REG),
-            new (Opcode.JEZ,   OpcodeArgumentType.REG_IMMED),
-            new (Opcode.JLZ,   OpcodeArgumentType.REG_IMMED),
-            new (Opcode.JLEZ,  OpcodeArgumentType.REG_IMMED),
-            new (Opcode.JGZ,   OpcodeArgumentType.REG_IMMED),
-            new (Opcode.JGEZ,  OpcodeArgumentType.REG_IMMED),
-            new (Opcode.REZ,   OpcodeArgumentType.REG),
-            new (Opcode.RLZ,   OpcodeArgumentType.REG),
-            new (Opcode.RLEZ,  OpcodeArgumentType.REG),
-            new (Opcode.RGZ,   OpcodeArgumentType.REG),
-            new (Opcode.RGEZ,  OpcodeArgumentType.REG),
-            new (Opcode.NOP,   OpcodeArgumentType.NONE),
+            new (OP.ADD,   RR,  1),
+            new (OP.SUB,   RR,  1),
+            new (OP.MUL,   RR,  1),
+            new (OP.DIV,   RR,  1),
+            new (OP.MOD,   RR,  1),
+            new (OP.AND,   RR,  1),
+            new (OP.OR,    RR,  1),
+            new (OP.XOR,   RR,  1),
+            new (OP.SHL,   RR,  1),
+            new (OP.SHR,   RR,  1),
+            new (OP.ADDI,  RI,  2),
+            new (OP.SUBI,  RI,  2),
+            new (OP.MULI,  RI,  2),
+            new (OP.MODI,  RI,  2),
+            new (OP.ANDI,  RI,  2),
+            new (OP.ORI,   RI,  2),
+            new (OP.XORI,  RI,  2),
+            new (OP.SHLI,  RI,  2),
+            new (OP.SHRI,  RI,  2),
+            new (OP.INC,   R,   1),
+            new (OP.DEC,   R,   1),
+            new (OP.NOT,   R,   1),
+            new (OP.NEG,   R,   1),
+            new (OP.JLT,   RRI, 2),
+            new (OP.JLTE,  RRI, 2),
+            new (OP.JGT,   RRI, 2),
+            new (OP.JGTE,  RRI, 2),
+            new (OP.JB,    RRI, 2),
+            new (OP.JBE,   RRI, 2),
+            new (OP.JA,    RRI, 2),
+            new (OP.JAE,   RRI, 2),
+            new (OP.JEQ,   RRI, 2),
+            new (OP.JNEQ,  RRI, 2),
+            new (OP.RLT,   RR,  1),
+            new (OP.RLTE,  RR,  1),
+            new (OP.RGT,   RR,  1),
+            new (OP.RGTE,  RR,  1),
+            new (OP.RB,    RR,  1),
+            new (OP.RBE,   RR,  1),
+            new (OP.RA,    RR,  1),
+            new (OP.RAE,   RR,  1),
+            new (OP.REQ,   RR,  1),
+            new (OP.RNEQ,  RR,  1),
+            new (OP.COPY,  RR,  1),
+            new (OP.LOAD,  RR,  1),
+            new (OP.STOR,  RR,  1),
+            new (OP.RXR,   RR,  1),
+            new (OP.RXM,   RR,  1),
+            new (OP.HI,    RR,  1),
+            new (OP.LO,    RR,  1),
+            new (OP.IN,    RR,  1),
+            new (OP.COPYI, RI,  2),
+            new (OP.INI,   RI,  2),
+            new (OP.OUTI,  RI,  2),
+            new (OP.SHAL,  RI,  2),
+            new (OP.SHAR,  RI,  2),
+            new (OP.JUMPR, R,   1),
+            //new (OP.SYSCALL, N, 1),
+            //new (OP.SYSRET,N    1),
+            new (OP.POPR,  N,   1),
+            new (OP.PUSHR, N,   1),
+            new (OP.JUMP,  I,   2),
+            new (OP.CALL,  I,   2),
+            new (OP.RET,   N,   1),
+            new (OP.HALT,  N,   1),
+            new (OP.EI,    N,   1),
+            new (OP.DI,    N,   1),
+            new (OP.CALLR, R,   1),
+            new (OP.PUSH,  R,   1),
+            new (OP.POP,   R,   1),
+            //new (OP.INTE,  R,   1),
+            new (OP.OUT,   R,   1),
+            new (OP.JEZ,   RI,  2),
+            new (OP.JLZ,   RI,  2),
+            new (OP.JLEZ,  RI,  2),
+            new (OP.JGZ,   RI,  2),
+            new (OP.JGEZ,  RI,  2),
+            new (OP.REZ,   R,   1),
+            new (OP.RLZ,   R,   1),
+            new (OP.RLEZ,  R,   1),
+            new (OP.RGZ,   R,   1),
+            new (OP.RGEZ,  R,   1),
+            new (OP.NOP,   N,   1),
         };
 
         public static IEnumerator GetDefinitionEnumerator()
@@ -107,33 +117,34 @@ namespace AssemblerTwo.Lib
 
         public readonly Opcode Name;
         public readonly OpcodeArgumentType ArgumentType;
+        public readonly int Cycles;
+
         public UInt16 CodeHint => (UInt16)Name;
 
-        public int ByteLength
-        {
-            get
-            {
-                switch (ArgumentType)
-                {
-                    case OpcodeArgumentType.NONE:
-                    case OpcodeArgumentType.REG:
-                    case OpcodeArgumentType.REG_REG:
-                        return 2;
-                    case OpcodeArgumentType.IMMED:
-                    case OpcodeArgumentType.REG_IMMED:
-                    case OpcodeArgumentType.REG_REG_IMMED:
-                        return 4;
-                    default:
-                        throw new NotImplementedException();
-                }
-            }
-        }
+        public int ByteLength => GetByteLength(ArgumentType);
 
-        private OpcodeDefinition(Opcode name, OpcodeArgumentType argumentType)
+        private OpcodeDefinition(Opcode name, OpcodeArgumentType argumentType, int cycles)
         {
             Name = name;
             ArgumentType = argumentType;
+            Cycles = cycles;
         }
 
+        public static int GetByteLength(OpcodeArgumentType argumentType)
+        {
+            switch (argumentType)
+            {
+                case OpcodeArgumentType.NONE:
+                case OpcodeArgumentType.REG:
+                case OpcodeArgumentType.REG_REG:
+                    return 2;
+                case OpcodeArgumentType.IMMED:
+                case OpcodeArgumentType.REG_IMMED:
+                case OpcodeArgumentType.REG_REG_IMMED:
+                    return 4;
+                default:
+                    throw new NotImplementedException();
+            }
+        }
     }
 }
