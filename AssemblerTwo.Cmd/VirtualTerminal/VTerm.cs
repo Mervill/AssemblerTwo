@@ -13,7 +13,7 @@ using ConsoleCanvas;
 namespace AssemblerTwo.Cmd.VirtualTerminal
 {
     // ● ○ ◌
-    // ─┌┐└┘
+    // ─┌┐└┘│
 
     public class VTerm : IInputOutputBus
     {
@@ -69,8 +69,19 @@ namespace AssemblerTwo.Cmd.VirtualTerminal
             Canvas.Startup(100, 40);
 
             var baseLayer = Canvas.GetNewLayer();
+            var virtualConsoleBorder = Canvas.GetNewLayer();
             mVirtualConsoleLayer = Canvas.GetNewLayer();
+            var memoryViewLayer = Canvas.GetNewLayer();
+            //var blinkLayer = Canvas.GetNewLayer();
             //var topLayer = Canvas.GetNewLayer();
+
+            virtualConsoleBorder.Write(0, 0, $"┌{new string('─', mVirtualConsoleWidth)}┐");
+            for (int x = 0; x < mVirtualConsoleHeight; x++)
+            {
+                virtualConsoleBorder.Write(1 + x, 0, "│");
+                virtualConsoleBorder.Write(1 + x, mVirtualConsoleWidth + 1, "│");
+            }
+            virtualConsoleBorder.Write(mVirtualConsoleHeight + 1, 0, $"└{new string('─', mVirtualConsoleWidth)}┘");
 
             /*var logicThread = new Thread(() => {
                 while (true)
@@ -148,40 +159,69 @@ namespace AssemblerTwo.Cmd.VirtualTerminal
 
                 //baseLayer.Write(16, 0, Convert.ToString(programCounter, 2).PadLeft(16, '0'));
 
-                var rootX = 18;
+                /*var rootX = 18;
                 var rootY = 1;
 
                 bool IsHalted = mVM.IsHalted;
                 bool CanInterrupt = mVM.CanInterrupt;
 
-                baseLayer.Clear();
+                blinkLayer.Clear();
 
-                baseLayer.Write(rootX + 0, rootY + 0, " W H I          ");
-                baseLayer.Write(rootX + 1, rootY + 0, "◌○◌○◌○◌◌◌◌◌◌◌◌◌◌");
+                blinkLayer.Write(rootX + 0, rootY + 0, " W H I          ");
+                blinkLayer.Write(rootX + 1, rootY + 0, "◌○◌○◌○◌◌◌◌◌◌◌◌◌◌");
 
-                baseLayer.Write(rootX + 1, rootY + 1, mDoVMSteps == 0 ? '●' : '○');
-                baseLayer.Write(rootX + 1, rootY + 3, IsHalted ? '●' : '○');
-                baseLayer.Write(rootX + 1, rootY + 5, CanInterrupt ? '●' : '○');
+                blinkLayer.Write(rootX + 1, rootY + 1, mDoVMSteps == 0 ? '●' : '○');
+                blinkLayer.Write(rootX + 1, rootY + 3, IsHalted ? '●' : '○');
+                blinkLayer.Write(rootX + 1, rootY + 5, CanInterrupt ? '●' : '○');
 
                 
-                baseLayer.Write(rootX + 0, rootY + 17, "┌───── PC ─────┐");
-                baseLayer.Write(rootX + 1, rootY + 17, GetDots((ushort)mVM.ProgramCounter));
+                blinkLayer.Write(rootX + 0, rootY + 17, "┌───── PC ─────┐");
+                blinkLayer.Write(rootX + 1, rootY + 17, GetDots((ushort)mVM.ProgramCounter));
 
-                baseLayer.Write(rootX + 2, rootY + 0, GetDots((ushort)mVM.StackPointer));
-                baseLayer.Write(rootX + 3, rootY + 0, "└ STACK ───────┘");
+                blinkLayer.Write(rootX + 2, rootY + 0, GetDots((ushort)mVM.StackPointer));
+                blinkLayer.Write(rootX + 3, rootY + 0, "└ STACK ───────┘");
 
-                baseLayer.Write(rootX + 2, rootY + 17, GetDots(mMemoryBus.Read16(mVM.ProgramCounter)));
-                baseLayer.Write(rootX + 3, rootY + 17, "└──── DATA ────┘");
+                blinkLayer.Write(rootX + 2, rootY + 17, GetDots(mMemoryBus.Read16(mVM.ProgramCounter)));
+                blinkLayer.Write(rootX + 3, rootY + 17, "└──── DATA ────┘");
 
-                baseLayer.Write(rootX + 5, rootY + 0, "F      87      0");
-                baseLayer.Write(rootX + 6, rootY + 0, GetSquares(mToggleWord));
-                baseLayer.Write(rootX + 7, rootY + controlFocusIndex, "▲");
+                blinkLayer.Write(rootX + 5, rootY + 0, "F      87      0");
+                blinkLayer.Write(rootX + 6, rootY + 0, GetSquares(mToggleWord));
+                blinkLayer.Write(rootX + 7, rootY + controlFocusIndex, "▲");
 
-                baseLayer.Write(rootX + 9, rootY + 0, "F1 - start/stop");
-                baseLayer.Write(rootX + 10, rootY + 0, "F2 - single step");
-                baseLayer.Write(rootX + 11, rootY + 0, Canvas.LastUpdatedPixels);
+                blinkLayer.Write(rootX + 9, rootY + 0, "F1 - start/stop");
+                blinkLayer.Write(rootX + 10, rootY + 0, "F2 - single step");
+                blinkLayer.Write(rootX + 11, rootY + 0, Canvas.LastUpdatedPixels);*/
 
-                //Canvas.InvalidateRenderCache();
+                memoryViewLayer.Clear();
+
+                var rootX = 18;
+                var rootY = 1;
+
+                var vmCounter = (ushort)mVM.ProgramCounter;
+                memoryViewLayer.Write(rootX + 0, rootY + 0, $"PC:{vmCounter:X4}");
+                memoryViewLayer.Write(rootX + 0, rootY + 32, "│");
+                memoryViewLayer.Write(rootX + 1, rootY + 0, $"A: {mVM.Registers[0]:X4} B: {mVM.Registers[1]:X4} C: {mVM.Registers[2]:X4} D: {mVM.Registers[3]:X4} │");
+                memoryViewLayer.Write(rootX + 2, rootY + 0, $"E: {mVM.Registers[4]:X4} F: {mVM.Registers[5]:X4} G: {mVM.Registers[6]:X4} H: {mVM.Registers[7]:X4} │");
+                memoryViewLayer.Write(rootX + 3, rootY + 0, $"I: {mVM.Registers[8]:X4} J: {mVM.Registers[9]:X4} K: {mVM.Registers[10]:X4} L: {mVM.Registers[11]:X4} │");
+                memoryViewLayer.Write(rootX + 4, rootY + 0, $"M: {mVM.Registers[12]:X4} N: {mVM.Registers[13]:X4} P: {mVM.Registers[14]:X4} S: {mVM.Registers[15]:X4} │");
+
+                ushort memViewCounter = vmCounter;
+                ushort memViewWord = 0;
+                /*if (memViewCounter == 0)
+                {
+
+                }
+                else
+                {
+                    memViewCounter = (ushort)(vmCounter - 1);
+                    memViewWord = mMemoryBus.Read16(memViewCounter);
+                    memViewCounter += WriteMemoryLine(rootX + 1, rootY + 0, memoryViewLayer, memViewCounter, memViewWord);
+                }*/
+
+                memViewCounter += WriteMemoryLine(rootX + 0, rootY + 34, memoryViewLayer, memViewCounter);
+                memViewCounter += WriteMemoryLine(rootX + 1, rootY + 34, memoryViewLayer, memViewCounter);
+
+
                 Canvas.Render();
                 //Thread.Sleep(1);
 
@@ -232,6 +272,64 @@ namespace AssemblerTwo.Cmd.VirtualTerminal
             for (int i = 0; i < mVirtualConsoleWidth; i++)
             {
                 mVirtualConsoleGrid[mVirtualConsoleHeight - 1, i] = '\0';
+            }
+        }
+
+        private ushort WriteMemoryLine(int x, int y, CanvasLayer memoryViewLayer, ushort address)
+        {
+            var currentWord = mMemoryBus.Read16(address);
+
+            RegisterName registerA;
+            RegisterName registerB;
+            var opcodeDef = OpcodeDefinition.Decode(currentWord, out registerA, out registerB);
+
+            if (opcodeDef != null)
+            {
+                var immediateWord = new string(' ', 4);
+                var argumentSection = string.Empty;
+                
+                switch (opcodeDef.ArgumentType)
+                {
+                    case OpcodeArgumentType.NONE:
+                    {
+                        break;
+                    }
+                    case OpcodeArgumentType.REG:
+                    {
+                        argumentSection = $" {registerB}";
+                        break;
+                    }
+                    case OpcodeArgumentType.IMMED:
+                    {
+                        argumentSection = $" {mMemoryBus.Read16(address + 2):X4}";
+                        break;
+                    }
+                    case OpcodeArgumentType.REG_REG:
+                    {
+                        argumentSection = $" {registerA}, {registerB}";
+                        break;
+                    }
+                    case OpcodeArgumentType.REG_IMMED:
+                    {
+                        immediateWord = mMemoryBus.Read16(address + 2).ToString("X4");
+                        argumentSection = $" {registerB}, {immediateWord}";
+                        break;
+                    }
+                    case OpcodeArgumentType.REG_REG_IMMED:
+                    {
+                        immediateWord = mMemoryBus.Read16(address + 2).ToString("X4");
+                        argumentSection = $" {registerA}, {registerB}, {immediateWord}";
+                        break;
+                    }
+                }
+                
+                memoryViewLayer.Write(x, y, $"{address:X4}: {currentWord:X4} {immediateWord} | {opcodeDef.Name,-5}{argumentSection}");
+
+                return (ushort)opcodeDef.ByteLength;
+            }
+            else
+            {
+                return 4;
             }
         }
 

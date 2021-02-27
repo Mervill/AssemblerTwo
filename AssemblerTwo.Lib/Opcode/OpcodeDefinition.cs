@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using System.Linq;
 
 namespace AssemblerTwo.Lib
 {
@@ -113,6 +114,30 @@ namespace AssemblerTwo.Lib
                     return entry;
 
             throw new NullReferenceException();
+        }
+
+        public static OpcodeDefinition Decode(UInt16 encodedOpcode, out RegisterName registerA, out RegisterName registerB)
+        {
+            registerA = (RegisterName)((encodedOpcode & 0x00F0) >> 4);
+            registerB = (RegisterName)(encodedOpcode & 0x000F);
+            var opNone = Table.FirstOrDefault(x => x.CodeHint == encodedOpcode);
+            if (opNone == null)
+            {
+                var opValueReg = encodedOpcode & 0xFFF0;
+                var opReg = Table.FirstOrDefault(x => x.CodeHint == opValueReg);
+                if (opReg == null)
+                {
+                    var opValueRegReg = encodedOpcode & 0xFF00;
+                    var opRegReg = Table.FirstOrDefault(x => x.CodeHint == opValueRegReg);
+                    if (opRegReg == null)
+                    {
+                        return null;
+                    }
+                    return opRegReg;
+                }
+                return opReg;
+            }
+            return opNone;
         }
 
         public readonly Opcode Name;
