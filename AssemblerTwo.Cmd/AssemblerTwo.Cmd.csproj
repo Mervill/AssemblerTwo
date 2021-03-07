@@ -1,9 +1,30 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>net5.0</TargetFramework>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Content Include="..\Documents\Sources\pangram.asm2.txt" Link="Sources\pangram.asm2.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Documents\Sources\print.asm2.txt" Link="Sources\print.asm2.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Documents\Sources\printbin.asm2.txt" Link="Sources\printbin.asm2.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Documents\Sources\printhex.asm2.txt" Link="Sources\printhex.asm2.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Documents\Sources\test.asm2.txt" Link="Sources\test.asm2.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Documents\Sources\test_div.asm2.txt" Link="Sources\test_div.asm2.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="CommandLineParser" Version="2.8.0" />
@@ -13,26 +34,5 @@
     <ProjectReference Include="..\AssemblerTwo.Lib\AssemblerTwo.Lib.csproj" />
     <ProjectReference Include="..\AssemblerTwo.VirtualMachine\AssemblerTwo.Machine.csproj" />
   </ItemGroup>
-
-  <ItemGroup>
-    <None Update="Sources\pangram.asm2.txt">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Sources\print.asm2.txt">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Sources\test_div.asm2.txt">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Sources\printbin.asm2.txt">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Sources\printhex.asm2.txt">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Sources\test.asm2.txt">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-
+  
 </Project>

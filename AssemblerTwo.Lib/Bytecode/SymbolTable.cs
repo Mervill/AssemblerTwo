@@ -156,12 +156,6 @@ namespace AssemblerTwo.Lib
             }
         }
 
-        private static void BinWrite16(BinaryWriter writer, ushort value)
-        {
-            var bytes = BitConverter.GetBytes(value).Reverse().ToArray();
-            writer.Write(bytes);
-        }
-
         public static SymbolTable FromFile(string filename)
         {
             using (StreamReader streamReader = new StreamReader(filename))
@@ -249,6 +243,12 @@ namespace AssemblerTwo.Lib
             var hibyte = reader.ReadByte();
             var lobyte = reader.ReadByte();
             return (ushort)((hibyte << 8) + lobyte);
+        }
+
+        private static void BinWrite16(BinaryWriter writer, ushort value)
+        {
+            var bytes = BitConverter.GetBytes(value).Reverse().ToArray();
+            writer.Write(bytes);
         }
     }
 }

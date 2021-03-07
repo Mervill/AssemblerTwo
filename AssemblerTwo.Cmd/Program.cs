@@ -19,7 +19,8 @@ namespace AssemblerTwo.Cmd
     {
         class Options
         {
-            const string kDefaultFilename = "out.a";
+            public const string kDefaultFilename = "out.a";
+            public const string kSymbolTableFilename = "out.st";
 
             [Option('m', "mode", HelpText = "Assembler mode")]
             public string Mode { get; set; }
@@ -29,6 +30,9 @@ namespace AssemblerTwo.Cmd
 
             [Option('o', "output", HelpText = "output file")]
             public string Output { get; set; } = kDefaultFilename;
+
+            [Option("st", HelpText = "symbol table file")]
+            public string SymbolTable { get; set; }
         }
 
         static void Main(string[] args)
@@ -122,6 +126,16 @@ namespace AssemblerTwo.Cmd
                         var bytes = buildResult.FinalBytes?.Bytes;
                         if (bytes != null)
                         {
+                            var symbolTableFilename = $"{o.Output}.st";
+                            if (!string.IsNullOrEmpty(o.SymbolTable))
+                            {
+                                symbolTableFilename = o.SymbolTable;
+                            }
+
+                            var symbolTableBytes = buildResult.FinalBytes.SymbolTable.GetBytes();
+                            Console.WriteLine($"Writing {symbolTableFilename} ({symbolTableBytes.Length} bytes)...");
+                            File.WriteAllBytes(symbolTableFilename, symbolTableBytes);
+
                             Console.WriteLine($"Writing {o.Output} ({bytes.Length} bytes)");
                             File.WriteAllBytes(o.Output, bytes);
                         }
@@ -186,7 +200,12 @@ namespace AssemblerTwo.Cmd
                         //Console.WriteLine("Symbol Table Bytes:");
                         //Console.WriteLine(DumpUtility.DumpBytes(symbolTableBytes));
 
-                        const string symbolTableFilename = "out.st";
+                        var symbolTableFilename = $"{o.Output}.st";
+                        if (!string.IsNullOrEmpty(o.SymbolTable))
+                        {
+                            symbolTableFilename = o.SymbolTable;
+                        }
+                        
                         Console.WriteLine($"Writing {symbolTableFilename} ({symbolTableBytes.Length} bytes)...");
                         File.WriteAllBytes(symbolTableFilename, symbolTableBytes);
 

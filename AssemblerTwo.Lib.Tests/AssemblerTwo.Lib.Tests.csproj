@@ -17,6 +17,27 @@
   </ItemGroup>
   
   <ItemGroup>
+    <Content Include="..\Documents\Sources\pangram.asm2.txt" Link="Sources\pangram.asm2.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Documents\Sources\print.asm2.txt" Link="Sources\print.asm2.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Documents\Sources\printbin.asm2.txt" Link="Sources\printbin.asm2.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Documents\Sources\printhex.asm2.txt" Link="Sources\printhex.asm2.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Documents\Sources\test.asm2.txt" Link="Sources\test.asm2.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Documents\Sources\test_div.asm2.txt" Link="Sources\test_div.asm2.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+  
+  <ItemGroup>
     <None Update="Data\Source\print_test.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
