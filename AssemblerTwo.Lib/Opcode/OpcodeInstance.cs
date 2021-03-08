@@ -31,7 +31,7 @@ namespace AssemblerTwo.Lib
                     }
                     default:
                     {
-                        throw new OpcodeInstanceException($"Can't set #{nameof(ARegister)} due to the state of the object! ({mOpcodeDef.ArgumentType})");
+                        throw new OpcodeInstanceException($"Can't set #{nameof(ARegister)} due to the state of the object ({mOpcodeDef.ArgumentType})!");
                     }
                 }
             }
@@ -49,7 +49,7 @@ namespace AssemblerTwo.Lib
                     }
                     default:
                     {
-                        throw new OpcodeInstanceException($"Can't get #{nameof(ARegister)} due to the state of the object! ({mOpcodeDef.ArgumentType})");
+                        throw new OpcodeInstanceException($"Can't get #{nameof(ARegister)} due to the state of the object ({mOpcodeDef.ArgumentType})!");
                     }
                 }
             }
@@ -70,7 +70,7 @@ namespace AssemblerTwo.Lib
                     }
                     default:
                     {
-                        throw new OpcodeInstanceException($"Can't set #{nameof(BRegister)} due to the state of the object! ({mOpcodeDef.ArgumentType})");
+                        throw new OpcodeInstanceException($"Can't set #{nameof(BRegister)} due to the state of the object ({mOpcodeDef.ArgumentType})!");
                     }
                 }
             }
@@ -86,7 +86,7 @@ namespace AssemblerTwo.Lib
                     }
                     default:
                     {
-                        throw new OpcodeInstanceException($"Can't get #{nameof(BRegister)} due to the state of the object! ({mOpcodeDef.ArgumentType})");
+                        throw new OpcodeInstanceException($"Can't get #{nameof(BRegister)} due to the state of the object ({mOpcodeDef.ArgumentType})!");
                     }
                 }
             }
@@ -108,7 +108,7 @@ namespace AssemblerTwo.Lib
                     }
                     default:
                     {
-                        throw new OpcodeInstanceException($"Can't set #{nameof(BRegister)} due to the state of the object! ({mOpcodeDef.ArgumentType})");
+                        throw new OpcodeInstanceException($"Can't set #{nameof(BRegister)} due to the state of the object ({mOpcodeDef.ArgumentType})!");
                     }
                 }
             }
@@ -125,7 +125,7 @@ namespace AssemblerTwo.Lib
                     }
                     default:
                     {
-                        throw new OpcodeInstanceException($"Can't get #{nameof(BRegister)} due to the state of the object! ({mOpcodeDef.ArgumentType})");
+                        throw new OpcodeInstanceException($"Can't get #{nameof(BRegister)} due to the state of the object ({mOpcodeDef.ArgumentType})!");
                     }
                 }
             }

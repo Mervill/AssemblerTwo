@@ -21,7 +21,7 @@ namespace AssemblerTwo.Lib.Tests
         public static void GeneratesCorrectBytes(Opcode opcode, RegisterName? regA, RegisterName? regB, int? immed, int[] expectedBytes)
         {
             ushort? immedShort = immed.HasValue ? (ushort)immed.Value : null;
-            var resultBytes = OpcodeBuilder.Create(opcode, regA, regB, immedShort);
+            var resultBytes = (new OpcodeInstance(opcode, regA, regB, immedShort)).GetBytes();
             var expectedBytesList = expectedBytes.SelectMany(x => BitConverter.GetBytes((UInt16)x).Reverse()).ToArray();
             Assert.AreEqual(expectedBytesList, resultBytes);
         }
