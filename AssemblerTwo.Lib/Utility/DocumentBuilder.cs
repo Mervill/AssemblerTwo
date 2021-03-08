@@ -5,7 +5,7 @@ using System.Text;
 
 namespace AssemblerTwo.Lib.Utility
 {
-    public class OpcodeBuilder
+    public class DocumentBuilder
     {
         readonly List<DocumentChunkType> mChunksIndex;
         readonly Dictionary<int, OpcodeInstance> mOpcodeChunks;
@@ -13,7 +13,7 @@ namespace AssemblerTwo.Lib.Utility
 
         public int Count => mChunksIndex.Count;
 
-        public OpcodeBuilder()
+        public DocumentBuilder()
         {
             mChunksIndex = new List<DocumentChunkType>();
             mOpcodeChunks = new Dictionary<int, OpcodeInstance>();

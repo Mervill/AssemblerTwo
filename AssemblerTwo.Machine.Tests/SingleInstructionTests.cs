@@ -41,11 +41,11 @@ namespace AssemblerTwo.Machine.Tests
         [TestCase(Opcode.LO, 0xBBAA, 0, 0xAA)]
         public static void RegRegResult(Opcode opcode, int valueA, int valueB, int result)
         {
-            var opcodeBuilder = new OpcodeBuilder();
-            opcodeBuilder.Append(opcode, RegisterName.A, RegisterName.B);
+            var documentBuilder = new DocumentBuilder();
+            documentBuilder.Append(opcode, RegisterName.A, RegisterName.B);
 
             var memBus = new DefaultMemoryBus();
-            memBus.CopyInto(opcodeBuilder.GetBytes(), 0);
+            memBus.CopyInto(documentBuilder.GetBytes(), 0);
 
             var ioBus = new EmptyIOBus();
 
@@ -72,11 +72,11 @@ namespace AssemblerTwo.Machine.Tests
         //SHRI
         public static void MathImmediateOp(Opcode opcode, int valueA, int valueB, int result)
         {
-            var opcodeBuilder = new OpcodeBuilder();
-            opcodeBuilder.Append(opcode, RegisterName.B, immed: (ushort)valueB);
+            var documentBuilder = new DocumentBuilder();
+            documentBuilder.Append(opcode, RegisterName.B, immed: (ushort)valueB);
 
             var memBus = new DefaultMemoryBus();
-            memBus.CopyInto(opcodeBuilder.GetBytes(), 0);
+            memBus.CopyInto(documentBuilder.GetBytes(), 0);
 
             var ioBus = new EmptyIOBus();
 
@@ -94,11 +94,11 @@ namespace AssemblerTwo.Machine.Tests
         {
             var expectedValue = (new Random().Next(Int16.MinValue + 1, Int16.MaxValue));
 
-            var opcodeBuilder = new OpcodeBuilder();
-            opcodeBuilder.Append(Opcode.INC, RegisterName.B);
+            var documentBuilder = new DocumentBuilder();
+            documentBuilder.Append(Opcode.INC, RegisterName.B);
 
             var memBus = new DefaultMemoryBus();
-            memBus.CopyInto(opcodeBuilder.GetBytes(), 0);
+            memBus.CopyInto(documentBuilder.GetBytes(), 0);
 
             var ioBus = new EmptyIOBus();
 
@@ -116,11 +116,11 @@ namespace AssemblerTwo.Machine.Tests
         {
             var expectedValue = (new Random().Next(Int16.MinValue, Int16.MaxValue - 1));
 
-            var opcodeBuilder = new OpcodeBuilder();
-            opcodeBuilder.Append(Opcode.DEC, RegisterName.B);
+            var documentBuilder = new DocumentBuilder();
+            documentBuilder.Append(Opcode.DEC, RegisterName.B);
 
             var memBus = new DefaultMemoryBus();
-            memBus.CopyInto(opcodeBuilder.GetBytes(), 0);
+            memBus.CopyInto(documentBuilder.GetBytes(), 0);
 
             var ioBus = new EmptyIOBus();
 
@@ -138,11 +138,11 @@ namespace AssemblerTwo.Machine.Tests
         {
             var expectedValue = (new Random().Next(Int16.MinValue, Int16.MaxValue));
 
-            var opcodeBuilder = new OpcodeBuilder();
-            opcodeBuilder.Append(Opcode.NOT, RegisterName.B);
+            var documentBuilder = new DocumentBuilder();
+            documentBuilder.Append(Opcode.NOT, RegisterName.B);
 
             var memBus = new DefaultMemoryBus();
-            memBus.CopyInto(opcodeBuilder.GetBytes(), 0);
+            memBus.CopyInto(documentBuilder.GetBytes(), 0);
 
             var ioBus = new EmptyIOBus();
 
@@ -160,11 +160,11 @@ namespace AssemblerTwo.Machine.Tests
         {
             var expectedValue = (new Random().Next(Int16.MinValue, Int16.MaxValue));
 
-            var opcodeBuilder = new OpcodeBuilder();
-            opcodeBuilder.Append(Opcode.NEG, RegisterName.B);
+            var documentBuilder = new DocumentBuilder();
+            documentBuilder.Append(Opcode.NEG, RegisterName.B);
 
             var memBus = new DefaultMemoryBus();
-            memBus.CopyInto(opcodeBuilder.GetBytes(), 0);
+            memBus.CopyInto(documentBuilder.GetBytes(), 0);
 
             var ioBus = new EmptyIOBus();
 
@@ -201,11 +201,11 @@ namespace AssemblerTwo.Machine.Tests
         [TestCase(Opcode.JNEQ,  5,  5, false)]
         public static void JumpCond(Opcode opcode, int valueA, int valueB, bool expectJump)
         {
-            var opcodeBuilder = new OpcodeBuilder();
-            opcodeBuilder.Append(opcode, RegisterName.B, RegisterName.C, 0xF00D);
+            var documentBuilder = new DocumentBuilder();
+            documentBuilder.Append(opcode, RegisterName.B, RegisterName.C, 0xF00D);
 
             var memBus = new DefaultMemoryBus();
-            memBus.CopyInto(opcodeBuilder.GetBytes(), 0);
+            memBus.CopyInto(documentBuilder.GetBytes(), 0);
 
             var ioBus = new EmptyIOBus();
 
@@ -244,11 +244,11 @@ namespace AssemblerTwo.Machine.Tests
         {
             Assert.Ignore();
             
-            var opcodeBuilder = new OpcodeBuilder();
-            opcodeBuilder.Append(opcode, RegisterName.B, RegisterName.C);
+            var documentBuilder = new DocumentBuilder();
+            documentBuilder.Append(opcode, RegisterName.B, RegisterName.C);
 
             var memBus = new DefaultMemoryBus();
-            memBus.CopyInto(opcodeBuilder.GetBytes(), 0);
+            memBus.CopyInto(documentBuilder.GetBytes(), 0);
 
             var ioBus = new EmptyIOBus();
 
@@ -269,12 +269,12 @@ namespace AssemblerTwo.Machine.Tests
             const ushort loadValue   = 0xF00D;
             const ushort loadAddress = 0x0002;
 
-            var opcodeBuilder = new OpcodeBuilder();
-            opcodeBuilder.Append(Opcode.LOAD, RegisterName.A, RegisterName.B);
-            opcodeBuilder.Append((loadValue >> 8), (loadValue & 0xFF));
+            var documentBuilder = new DocumentBuilder();
+            documentBuilder.Append(Opcode.LOAD, RegisterName.A, RegisterName.B);
+            documentBuilder.Append((loadValue >> 8), (loadValue & 0xFF));
             
             var memBus = new DefaultMemoryBus();
-            memBus.CopyInto(opcodeBuilder.GetBytes(), 0);
+            memBus.CopyInto(documentBuilder.GetBytes(), 0);
 
             var ioBus = new EmptyIOBus();
 
@@ -293,11 +293,11 @@ namespace AssemblerTwo.Machine.Tests
             const ushort storeValue   = 0xF00D;
             const ushort storeAddress = 0x0002;
 
-            var opcodeBuilder = new OpcodeBuilder();
-            opcodeBuilder.Append(Opcode.STOR, RegisterName.A, RegisterName.B);
+            var documentBuilder = new DocumentBuilder();
+            documentBuilder.Append(Opcode.STOR, RegisterName.A, RegisterName.B);
             
             var memBus = new DefaultMemoryBus();
-            memBus.CopyInto(opcodeBuilder.GetBytes(), 0);
+            memBus.CopyInto(documentBuilder.GetBytes(), 0);
 
             var ioBus = new EmptyIOBus();
 
@@ -323,11 +323,11 @@ namespace AssemblerTwo.Machine.Tests
         {
             const ushort immedValue = 0xF00D;
 
-            var opcodeBuilder = new OpcodeBuilder();
-            opcodeBuilder.Append(Opcode.COPYI, RegisterName.B, immed: immedValue);
+            var documentBuilder = new DocumentBuilder();
+            documentBuilder.Append(Opcode.COPYI, RegisterName.B, immed: immedValue);
             
             var memBus = new DefaultMemoryBus();
-            memBus.CopyInto(opcodeBuilder.GetBytes(), 0);
+            memBus.CopyInto(documentBuilder.GetBytes(), 0);
 
             var ioBus = new EmptyIOBus();
 
@@ -347,11 +347,11 @@ namespace AssemblerTwo.Machine.Tests
         {
             const ushort jumpAddress = 0xF00D;
 
-            var opcodeBuilder = new OpcodeBuilder();
-            opcodeBuilder.Append(Opcode.JUMPR, RegisterName.B);
+            var documentBuilder = new DocumentBuilder();
+            documentBuilder.Append(Opcode.JUMPR, RegisterName.B);
 
             var memBus = new DefaultMemoryBus();
-            memBus.CopyInto(opcodeBuilder.GetBytes(), 0);
+            memBus.CopyInto(documentBuilder.GetBytes(), 0);
 
             var ioBus = new EmptyIOBus();
 
@@ -367,11 +367,11 @@ namespace AssemblerTwo.Machine.Tests
         {
             const ushort jumpAddress = 0xF00D;
 
-            var opcodeBuilder = new OpcodeBuilder();
-            opcodeBuilder.Append(Opcode.JUMP, immed: jumpAddress);
+            var documentBuilder = new DocumentBuilder();
+            documentBuilder.Append(Opcode.JUMP, immed: jumpAddress);
 
             var memBus = new DefaultMemoryBus();
-            memBus.CopyInto(opcodeBuilder.GetBytes(), 0);
+            memBus.CopyInto(documentBuilder.GetBytes(), 0);
 
             var ioBus = new EmptyIOBus();
 
@@ -388,11 +388,11 @@ namespace AssemblerTwo.Machine.Tests
             const int stackOrigin = 0x000F;
             const int callTarget  = 0xF00D;
 
-            var opcodeBuilder = new OpcodeBuilder();
-            opcodeBuilder.Append(Opcode.CALL, immed: callTarget);
+            var documentBuilder = new DocumentBuilder();
+            documentBuilder.Append(Opcode.CALL, immed: callTarget);
 
             var memBus = new DefaultMemoryBus();
-            memBus.CopyInto(opcodeBuilder.GetBytes(), progamBase);
+            memBus.CopyInto(documentBuilder.GetBytes(), progamBase);
 
             var ioBus = new EmptyIOBus();
 
@@ -411,11 +411,11 @@ namespace AssemblerTwo.Machine.Tests
         [Test]
         public static void Halt()
         {
-            var opcodeBuilder = new OpcodeBuilder();
-            opcodeBuilder.Append(Opcode.HALT);
+            var documentBuilder = new DocumentBuilder();
+            documentBuilder.Append(Opcode.HALT);
 
             var memBus = new DefaultMemoryBus();
-            memBus.CopyInto(opcodeBuilder.GetBytes(), 0);
+            memBus.CopyInto(documentBuilder.GetBytes(), 0);
 
             var ioBus = new EmptyIOBus();
 
@@ -437,11 +437,11 @@ namespace AssemblerTwo.Machine.Tests
             const int stackOrigin = 0xFFFF;
             const int stackValue  = 0xF00D;
 
-            var opcodeBuilder = new OpcodeBuilder();
-            opcodeBuilder.Append(Opcode.PUSH, RegisterName.B);
+            var documentBuilder = new DocumentBuilder();
+            documentBuilder.Append(Opcode.PUSH, RegisterName.B);
 
             var memBus = new DefaultMemoryBus();
-            memBus.CopyInto(opcodeBuilder.GetBytes(), 0);
+            memBus.CopyInto(documentBuilder.GetBytes(), 0);
 
             var ioBus = new EmptyIOBus();
 
@@ -463,11 +463,11 @@ namespace AssemblerTwo.Machine.Tests
             const int stackOrigin = 0xFFFF;
             const int stackValue  = 0xF00D;
 
-            var opcodeBuilder = new OpcodeBuilder();
-            opcodeBuilder.Append(Opcode.POP, RegisterName.B);
+            var documentBuilder = new DocumentBuilder();
+            documentBuilder.Append(Opcode.POP, RegisterName.B);
 
             var memBus = new DefaultMemoryBus();
-            memBus.CopyInto(opcodeBuilder.GetBytes(), 0);
+            memBus.CopyInto(documentBuilder.GetBytes(), 0);
             //memBus.Write(0xFFFE, 0xF0);
             //memBus.Write(0xFFFF, 0x0D);
             memBus.Write16(stackOrigin - 2, stackValue);
