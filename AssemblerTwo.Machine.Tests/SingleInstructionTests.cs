@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Text;
 
 using AssemblerTwo.Lib;
-using AssemblerTwo.Lib.Utility;
 using AssemblerTwo.Machine;
 
 using NUnit.Framework;

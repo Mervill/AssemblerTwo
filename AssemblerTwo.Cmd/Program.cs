@@ -190,7 +190,7 @@ namespace AssemblerTwo.Cmd
                         var byteGroup = Assembler.GenerateBytecode(parseResult.SyntaxTree, true, true);
 
                         Console.WriteLine("Bytecode:");
-                        var bytes = byteGroup.Bytes;
+                        var finalBytes = byteGroup.Bytes;
                         Console.WriteLine(DumpUtility.DumpBytes(byteGroup.Bytes));
 
                         Console.WriteLine("DumpSymbolTable:");
@@ -214,10 +214,71 @@ namespace AssemblerTwo.Cmd
 
                         //bytes = BytecodeUtil.Relocate(byteGroup, 0x0002);
 
-                        Console.WriteLine($"Writing {o.Output} ({bytes.Length} bytes)...");
-                        File.WriteAllBytes(o.Output, bytes);
+                        Console.WriteLine($"Writing {o.Output} ({finalBytes.Length} bytes)...");
+                        File.WriteAllBytes(o.Output, finalBytes);
 
                         Console.WriteLine();
+
+                        var sb = new StringBuilder();
+                        var doc = new DocumentBuilder();
+                        var byteIndex = 0;
+                        Disassembler.PrimitiveDisassembleInstructions(doc, finalBytes);
+                        foreach(var chunk in doc.GetChunkEnumerable())
+                        {
+                            sb.Append($"{byteIndex:X4}: ");
+                            switch (chunk.chunkType)
+                            {
+                                case DocumentChunkType.Instruction:
+                                {
+                                    var opcodeInstance = (OpcodeInstance)chunk.dataObject;
+                                    var bytes = opcodeInstance.GetBytes();
+
+                                    sb.Append($"{bytes[0]:X2}{bytes[1]:X2}");
+                                    if (opcodeInstance.Def.ByteLength == 4)
+                                    {
+                                        sb.Append($" {bytes[2]:X2}{bytes[3]:X2}");
+                                    }
+                                    else
+                                    {
+                                        sb.Append(new string(' ', 5));
+                                    }
+                                    sb.Append($" {DocumentBuilder.FancyPrintColumnSep} ");
+                                    sb.Append(opcodeInstance.GetString());
+                                    sb.AppendLine();
+                                    byteIndex += bytes.Length;
+                                    continue;
+                                }
+                                case DocumentChunkType.String:
+                                {
+                                    throw new NotImplementedException();
+                                }
+                                case DocumentChunkType.Binary:
+                                {
+                                    var byteArray = (byte[])chunk.dataObject;
+                                    //DumpUtility.DumpBytes(sb, byteArray);
+                                    sb.Append($"BIN  {byteArray.Length:X4}");
+                                    sb.Append($" {DocumentBuilder.FancyPrintColumnSep} ");
+                                    var byteDumpStr = DumpUtility.DumpBytes(byteArray);
+                                    var byteDumpLines = byteDumpStr.Split(Environment.NewLine);
+                                    sb.Append(byteDumpLines[0]);
+                                    sb.AppendLine();
+                                    if (byteDumpLines.Length > 1)
+                                    {
+                                        for (int x = 1; x < byteDumpLines.Length; x++)
+                                        {
+                                            sb.Append(new string(' ', 15));
+                                            sb.Append($" {DocumentBuilder.FancyPrintColumnSep} ");
+                                            sb.Append(byteDumpLines[x]);
+                                            sb.AppendLine();
+                                        }
+                                    }
+                                    byteIndex += byteArray.Length;
+                                    continue;
+                                }
+                            }
+                        }
+
+                        Console.WriteLine(sb.ToString());
 
                         Console.WriteLine("Process complete!");
 

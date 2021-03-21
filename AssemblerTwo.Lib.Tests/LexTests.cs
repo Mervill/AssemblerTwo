@@ -11,6 +11,29 @@ namespace AssemblerTwo.Lib.Tests
     [TestFixture]
     public class LexTests
     {
+        [Test, TestCaseSource(nameof(DoesntAcceptNullOrEmptyCases))]
+        public static void DoesntAcceptNullOrEmpty(List<StringTokenInfo> sourceTokens)
+        {
+            Assert.Throws<ArgumentException>(() => Assembler.Lex(sourceTokens));
+        }
+
+        public static System.Collections.IEnumerable DoesntAcceptNullOrEmptyCases()
+        {
+            yield return new TestCaseData(null);
+            yield return new TestCaseData(new List<StringTokenInfo>());
+        }
+
+        [Test]
+        public static void ThowOnUnknownToken()
+        {
+            // Lexer should thow an exception if it encounters an unknown token
+            // anywhere in the input list
+            var stringToken = new StringTokenInfo(StringToken.Unknown, string.Empty);
+            var stringTokenList = new List<StringTokenInfo>();
+            stringTokenList.Add(stringToken);
+            Assert.Throws<AssemblerException>(() => Assembler.Lex(stringTokenList));
+        }
+
         public static void SimpleLexTest()
         {
 

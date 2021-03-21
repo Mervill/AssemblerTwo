@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-using AssemblerTwo.Lib.Utility;
-
 using NUnit.Framework;
 
 namespace AssemblerTwo.Lib.Tests

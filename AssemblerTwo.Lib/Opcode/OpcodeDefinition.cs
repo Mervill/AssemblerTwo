@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections;
+using System.Diagnostics;
 using System.Linq;
 
 namespace AssemblerTwo.Lib
 {
     using OP = Opcode;
     
+    [DebuggerDisplay("{Name} ({ArgumentType})")]
     public class OpcodeDefinition
     {
         const OpcodeArgumentType N   = OpcodeArgumentType.NONE;
@@ -116,8 +118,52 @@ namespace AssemblerTwo.Lib
             throw new NullReferenceException();
         }
 
-        public static OpcodeDefinition Decode(UInt16 encodedOpcode, out RegisterName registerA, out RegisterName registerB)
+        public static OpcodeDefinition Decode(UInt16 encodedOpcode, out RegisterName? registerA, out RegisterName? registerB)
         {
+            registerA = null;
+            registerB = null;
+
+            int testCode = encodedOpcode;
+            OpcodeDefinition testResult = null;
+
+            testResult = Table.FirstOrDefault(x => x.CodeHint == testCode);
+            if (testResult == null)
+            {
+                testCode = encodedOpcode & 0xFFF0;
+                testResult = Table.FirstOrDefault(x => x.CodeHint == testCode);
+                if (testResult == null)
+                {
+                    testCode = encodedOpcode & 0xFF00;
+                    testResult = Table.FirstOrDefault(x => x.CodeHint == testCode);
+                    if (testResult == null)
+                    {
+                        return null;
+                    }
+                    else
+                    {
+                        registerA = (RegisterName)((encodedOpcode & 0x00F0) >> 4);
+                        registerB = (RegisterName)(encodedOpcode & 0x000F);
+                        return testResult;
+                    }
+                }
+                else
+                {
+                    if (testResult.RegisterCount == 1)
+                    {
+                        registerA = (RegisterName)(encodedOpcode & 0x000F);
+                        return testResult;
+                    }
+                    else
+                    {
+                        registerA = (RegisterName)((encodedOpcode & 0x00F0) >> 4);
+                        registerB = (RegisterName)(encodedOpcode & 0x000F);
+                        return testResult;
+                    }
+                }
+            }
+            return testResult;
+
+            /*
             registerA = (RegisterName)((encodedOpcode & 0x00F0) >> 4);
             registerB = (RegisterName)(encodedOpcode & 0x000F);
             var opNone = Table.FirstOrDefault(x => x.CodeHint == encodedOpcode);
@@ -131,14 +177,41 @@ namespace AssemblerTwo.Lib
                     var opRegReg = Table.FirstOrDefault(x => x.CodeHint == opValueRegReg);
                     if (opRegReg == null)
                     {
+                        registerA = null;
+                        registerB = null;
                         return null;
                     }
                     return opRegReg;
                 }
+                registerB = null;
                 return opReg;
             }
+            registerA = null;
+            registerB = null;
             return opNone;
+            */
         }
+
+        public static OpcodeInstance DecodeInstance(UInt16 encodedOpcode)
+        {
+            RegisterName? regA;
+            RegisterName? regB;
+            OpcodeDefinition def = Decode(encodedOpcode, out regA, out regB);
+            if (def != null)
+            {
+                if (def.RequiresImmediate)
+                {
+                    return new OpcodeInstance(def.Name, regA, regB, 0);
+                }
+                else
+                {
+                    return new OpcodeInstance(def.Name, regA, regB);
+                }
+            }
+            return null;
+        }
+
+        public static readonly int LogestInstructionName;
 
         public readonly Opcode Name;
         public readonly OpcodeArgumentType ArgumentType;
@@ -147,6 +220,18 @@ namespace AssemblerTwo.Lib
         public UInt16 CodeHint => (UInt16)Name;
 
         public int ByteLength => GetByteLength(ArgumentType);
+        public int RegisterCount => GetRegisterCount(ArgumentType);
+        public bool RequiresImmediate => GetRequiresImmediate(ArgumentType);
+
+        static OpcodeDefinition()
+        {
+            foreach (var def in Table)
+            {
+                var nameString = def.Name.ToString();
+                if (nameString.Length > LogestInstructionName)
+                    LogestInstructionName = nameString.Length;
+            }
+        }
 
         private OpcodeDefinition(Opcode name, OpcodeArgumentType argumentType, int cycles)
         {
@@ -169,6 +254,38 @@ namespace AssemblerTwo.Lib
                     return 4;
                 default:
                     throw new NotImplementedException();
+            }
+        }
+
+        public static int GetRegisterCount(OpcodeArgumentType argumentType)
+        {
+            switch (argumentType)
+            {
+                case OpcodeArgumentType.REG:
+                case OpcodeArgumentType.REG_IMMED:
+                    return 1;
+                case OpcodeArgumentType.REG_REG:
+                case OpcodeArgumentType.REG_REG_IMMED:
+                    return 2;
+                default:
+                    return 0;
+            }
+        }
+
+        public static bool GetRequiresImmediate(OpcodeArgumentType argumentType)
+        {
+            switch (argumentType)
+            {
+                case OpcodeArgumentType.IMMED:
+                case OpcodeArgumentType.REG_IMMED:
+                case OpcodeArgumentType.REG_REG_IMMED:
+                {
+                    return true;
+                }
+                default:
+                {
+                    return false;
+                }
             }
         }
     }

@@ -1,25 +1,29 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 
 namespace AssemblerTwo.Lib
 {
+    [DebuggerDisplay("{Opcode}")]
     public class OpcodeInstance
     {
         private OpcodeDefinition mOpcodeDef;
 
         public Opcode Opcode => mOpcodeDef.Name;
 
+        public OpcodeArgumentType ArgumentType => mOpcodeDef.ArgumentType;
+
         public OpcodeDefinition Def => mOpcodeDef;
 
         private RegisterName mARegester;
 
-        public RegisterName ARegister 
+        public RegisterName ARegister
         { 
             get
             {
-                switch (mOpcodeDef.ArgumentType)
+                switch (ArgumentType)
                 {
                     case OpcodeArgumentType.REG:
                     case OpcodeArgumentType.REG_IMMED:
@@ -30,13 +34,13 @@ namespace AssemblerTwo.Lib
                     }
                     default:
                     {
-                        throw new OpcodeInstanceException($"Can't set #{nameof(ARegister)} due to the state of the object ({mOpcodeDef.ArgumentType})!");
+                        throw new OpcodeInstanceException($"Can't set #{nameof(ARegister)} due to the state of the object ({ArgumentType})!");
                     }
                 }
             }
             set
             {
-                switch (mOpcodeDef.ArgumentType)
+                switch (ArgumentType)
                 {
                     case OpcodeArgumentType.REG:
                     case OpcodeArgumentType.REG_IMMED:
@@ -48,7 +52,7 @@ namespace AssemblerTwo.Lib
                     }
                     default:
                     {
-                        throw new OpcodeInstanceException($"Can't get #{nameof(ARegister)} due to the state of the object ({mOpcodeDef.ArgumentType})!");
+                        throw new OpcodeInstanceException($"Can't get #{nameof(ARegister)} due to the state of the object ({ArgumentType})!");
                     }
                 }
             }
@@ -60,7 +64,7 @@ namespace AssemblerTwo.Lib
         {
             get
             {
-                switch (mOpcodeDef.ArgumentType)
+                switch (ArgumentType)
                 {
                     case OpcodeArgumentType.REG_REG:
                     case OpcodeArgumentType.REG_REG_IMMED:
@@ -69,13 +73,13 @@ namespace AssemblerTwo.Lib
                     }
                     default:
                     {
-                        throw new OpcodeInstanceException($"Can't set #{nameof(BRegister)} due to the state of the object ({mOpcodeDef.ArgumentType})!");
+                        throw new OpcodeInstanceException($"Can't set #{nameof(BRegister)} due to the state of the object ({ArgumentType})!");
                     }
                 }
             }
             set
             {
-                switch (mOpcodeDef.ArgumentType)
+                switch (ArgumentType)
                 {
                     case OpcodeArgumentType.REG_REG:
                     case OpcodeArgumentType.REG_REG_IMMED:
@@ -85,7 +89,7 @@ namespace AssemblerTwo.Lib
                     }
                     default:
                     {
-                        throw new OpcodeInstanceException($"Can't get #{nameof(BRegister)} due to the state of the object ({mOpcodeDef.ArgumentType})!");
+                        throw new OpcodeInstanceException($"Can't get #{nameof(BRegister)} due to the state of the object ({ArgumentType})!");
                     }
                 }
             }
@@ -97,7 +101,7 @@ namespace AssemblerTwo.Lib
         {
             get
             {
-                switch (mOpcodeDef.ArgumentType)
+                switch (ArgumentType)
                 {
                     case OpcodeArgumentType.IMMED:
                     case OpcodeArgumentType.REG_IMMED:
@@ -107,13 +111,13 @@ namespace AssemblerTwo.Lib
                     }
                     default:
                     {
-                        throw new OpcodeInstanceException($"Can't set #{nameof(BRegister)} due to the state of the object ({mOpcodeDef.ArgumentType})!");
+                        throw new OpcodeInstanceException($"Can't set #{nameof(BRegister)} due to the state of the object ({ArgumentType})!");
                     }
                 }
             }
             set
             {
-                switch (mOpcodeDef.ArgumentType)
+                switch (ArgumentType)
                 {
                     case OpcodeArgumentType.IMMED:
                     case OpcodeArgumentType.REG_IMMED:
@@ -124,7 +128,7 @@ namespace AssemblerTwo.Lib
                     }
                     default:
                     {
-                        throw new OpcodeInstanceException($"Can't get #{nameof(BRegister)} due to the state of the object ({mOpcodeDef.ArgumentType})!");
+                        throw new OpcodeInstanceException($"Can't get #{nameof(BRegister)} due to the state of the object ({ArgumentType})!");
                     }
                 }
             }
@@ -133,16 +137,16 @@ namespace AssemblerTwo.Lib
         public OpcodeInstance(Opcode opcode, RegisterName? regA = null, RegisterName? regB = null, UInt16? immed = null)
         {
             mOpcodeDef = OpcodeDefinition.Get(opcode);
-            switch (mOpcodeDef.ArgumentType)
+            switch (ArgumentType)
             {
                 case OpcodeArgumentType.NONE:
                 {
                     if (regA.HasValue)
-                        throw new ArgumentException($"{nameof(Opcode)}.{opcode} expects null for this argument ({mOpcodeDef.ArgumentType})!", nameof(regA));
+                        throw new ArgumentException($"{nameof(Opcode)}.{opcode} expects null for this argument ({ArgumentType})!", nameof(regA));
                     if (regB.HasValue)
-                        throw new ArgumentException($"{nameof(Opcode)}.{opcode} expects null for this argument ({mOpcodeDef.ArgumentType})!", nameof(regB));
+                        throw new ArgumentException($"{nameof(Opcode)}.{opcode} expects null for this argument ({ArgumentType})!", nameof(regB));
                     if (immed.HasValue)
-                        throw new ArgumentException($"{nameof(Opcode)}.{opcode} expects null for this argument ({mOpcodeDef.ArgumentType})!", nameof(immed));
+                        throw new ArgumentException($"{nameof(Opcode)}.{opcode} expects null for this argument ({ArgumentType})!", nameof(immed));
 
                     // no-op
                     break;
@@ -150,11 +154,11 @@ namespace AssemblerTwo.Lib
                 case OpcodeArgumentType.REG:
                 {
                     if (!regA.HasValue)
-                        throw new ArgumentException($"{nameof(Opcode)}.{opcode} expects a value for this argument ({mOpcodeDef.ArgumentType})!", nameof(regA));
+                        throw new ArgumentException($"{nameof(Opcode)}.{opcode} expects a value for this argument ({ArgumentType})!", nameof(regA));
                     if (regB.HasValue)
-                        throw new ArgumentException($"{nameof(Opcode)}.{opcode} expects null for this argument ({mOpcodeDef.ArgumentType})!", nameof(regB));
+                        throw new ArgumentException($"{nameof(Opcode)}.{opcode} expects null for this argument ({ArgumentType})!", nameof(regB));
                     if (immed.HasValue)
-                        throw new ArgumentException($"{nameof(Opcode)}.{opcode} expects null for this argument ({mOpcodeDef.ArgumentType})!", nameof(immed));
+                        throw new ArgumentException($"{nameof(Opcode)}.{opcode} expects null for this argument ({ArgumentType})!", nameof(immed));
 
                     mARegester = regA.Value;
 
@@ -163,11 +167,11 @@ namespace AssemblerTwo.Lib
                 case OpcodeArgumentType.IMMED:
                 {
                     if (regA.HasValue)
-                        throw new ArgumentException($"{nameof(Opcode)}.{opcode} expects null for this argument ({mOpcodeDef.ArgumentType})!", nameof(regA));
+                        throw new ArgumentException($"{nameof(Opcode)}.{opcode} expects null for this argument ({ArgumentType})!", nameof(regA));
                     if (regB.HasValue)
-                        throw new ArgumentException($"{nameof(Opcode)}.{opcode} expects null for this argument ({mOpcodeDef.ArgumentType})!", nameof(regB));
+                        throw new ArgumentException($"{nameof(Opcode)}.{opcode} expects null for this argument ({ArgumentType})!", nameof(regB));
                     if (!immed.HasValue)
-                        throw new ArgumentException($"{nameof(Opcode)}.{opcode} expects a value for this argument ({mOpcodeDef.ArgumentType})!", nameof(immed));
+                        throw new ArgumentException($"{nameof(Opcode)}.{opcode} expects a value for this argument ({ArgumentType})!", nameof(immed));
 
                     mImmediateValue = immed.Value;
 
@@ -176,11 +180,11 @@ namespace AssemblerTwo.Lib
                 case OpcodeArgumentType.REG_REG:
                 {
                     if (!regA.HasValue)
-                        throw new ArgumentException($"{nameof(Opcode)}.{opcode} expects a value for this argument ({mOpcodeDef.ArgumentType})!", nameof(regA));
+                        throw new ArgumentException($"{nameof(Opcode)}.{opcode} expects a value for this argument ({ArgumentType})!", nameof(regA));
                     if (!regB.HasValue)
-                        throw new ArgumentException($"{nameof(Opcode)}.{opcode} expects a value for this argument ({mOpcodeDef.ArgumentType})!", nameof(regB));
+                        throw new ArgumentException($"{nameof(Opcode)}.{opcode} expects a value for this argument ({ArgumentType})!", nameof(regB));
                     if (immed.HasValue)
-                        throw new ArgumentException($"{nameof(Opcode)}.{opcode} expects null for this argument ({mOpcodeDef.ArgumentType})!", nameof(immed));
+                        throw new ArgumentException($"{nameof(Opcode)}.{opcode} expects null for this argument ({ArgumentType})!", nameof(immed));
 
                     mARegester = regA.Value;
                     mBRegester = regB.Value;
@@ -190,11 +194,11 @@ namespace AssemblerTwo.Lib
                 case OpcodeArgumentType.REG_IMMED:
                 {
                     if (!regA.HasValue)
-                        throw new ArgumentException($"{nameof(Opcode)}.{opcode} expects a value for this argument ({mOpcodeDef.ArgumentType})!", nameof(regA));
+                        throw new ArgumentException($"{nameof(Opcode)}.{opcode} expects a value for this argument ({ArgumentType})!", nameof(regA));
                     if (regB.HasValue)
-                        throw new ArgumentException($"{nameof(Opcode)}.{opcode} expects null for this argument ({mOpcodeDef.ArgumentType})!", nameof(regB));
+                        throw new ArgumentException($"{nameof(Opcode)}.{opcode} expects null for this argument ({ArgumentType})!", nameof(regB));
                     if (!immed.HasValue)
-                        throw new ArgumentException($"{nameof(Opcode)}.{opcode} expects a value for this argument ({mOpcodeDef.ArgumentType})!", nameof(immed));
+                        throw new ArgumentException($"{nameof(Opcode)}.{opcode} expects a value for this argument ({ArgumentType})!", nameof(immed));
 
                     mARegester = regA.Value;
                     mImmediateValue = immed.Value;
@@ -204,11 +208,11 @@ namespace AssemblerTwo.Lib
                 case OpcodeArgumentType.REG_REG_IMMED:
                 {
                     if (!regA.HasValue)
-                        throw new ArgumentException($"{nameof(Opcode)}.{opcode} expects a value for this argument ({mOpcodeDef.ArgumentType})!", nameof(regA));
+                        throw new ArgumentException($"{nameof(Opcode)}.{opcode} expects a value for this argument ({ArgumentType})!", nameof(regA));
                     if (!regB.HasValue)
-                        throw new ArgumentException($"{nameof(Opcode)}.{opcode} expects a value for this argument ({mOpcodeDef.ArgumentType})!", nameof(regB));
+                        throw new ArgumentException($"{nameof(Opcode)}.{opcode} expects a value for this argument ({ArgumentType})!", nameof(regB));
                     if (!immed.HasValue)
-                        throw new ArgumentException($"{nameof(Opcode)}.{opcode} expects a value for this argument ({mOpcodeDef.ArgumentType})!", nameof(immed));
+                        throw new ArgumentException($"{nameof(Opcode)}.{opcode} expects a value for this argument ({ArgumentType})!", nameof(immed));
 
                     mARegester = regA.Value;
                     mBRegester = regB.Value;
@@ -216,16 +220,19 @@ namespace AssemblerTwo.Lib
 
                     break;
                 }
+                default:
+                {
+                    throw new OpcodeInstanceException($"Unknown State {ArgumentType}!");
+                }
             }
         }
 
         public byte[] GetBytes()
         {
-            switch (mOpcodeDef.ArgumentType)
+            switch (ArgumentType)
             {
                 case OpcodeArgumentType.NONE:
                 {
-
                     var opcodeWord = (UInt16)(mOpcodeDef.CodeHint);
                     var opcodeBytes = BitConverter.GetBytes(opcodeWord).Reverse().ToArray();
 
@@ -233,7 +240,6 @@ namespace AssemblerTwo.Lib
                 }
                 case OpcodeArgumentType.REG:
                 {
-
                     var opcodeWord = (UInt16)(mOpcodeDef.CodeHint + (byte)mARegester);
                     var opcodeBytes = BitConverter.GetBytes(opcodeWord).Reverse().ToArray();
 
@@ -276,10 +282,52 @@ namespace AssemblerTwo.Lib
                 }
                 default:
                 {
-                    throw new OpcodeInstanceException($"Unknown State {mOpcodeDef.ArgumentType}!");
+                    throw new OpcodeInstanceException($"Unknown State {ArgumentType}!");
                 }
             }
         }
 
+        public string GetString(bool immedateFormatHex = true)
+        {
+            switch (ArgumentType)
+            {
+                case OpcodeArgumentType.NONE:
+                {
+                    return $"{Opcode}";
+                }
+                case OpcodeArgumentType.REG:
+                {
+                    var opcodeString = Opcode.ToString().PadRight(OpcodeDefinition.LogestInstructionName);
+                    return $"{opcodeString} {mARegester}";
+                }
+                case OpcodeArgumentType.IMMED:
+                {
+                    var opcodeString = Opcode.ToString().PadRight(OpcodeDefinition.LogestInstructionName);
+                    var immediateString = mImmediateValue.ToString((immedateFormatHex) ? "X4" : null);
+                    return $"{opcodeString} {immediateString}";
+                }
+                case OpcodeArgumentType.REG_REG:
+                {
+                    var opcodeString = Opcode.ToString().PadRight(OpcodeDefinition.LogestInstructionName);
+                    return $"{opcodeString} {mARegester},{mBRegester}";
+                }
+                case OpcodeArgumentType.REG_IMMED:
+                {
+                    var opcodeString = Opcode.ToString().PadRight(OpcodeDefinition.LogestInstructionName);
+                    var immediateString = mImmediateValue.ToString((immedateFormatHex) ? "X4" : null);
+                    return $"{opcodeString} {mARegester},{immediateString}";
+                }
+                case OpcodeArgumentType.REG_REG_IMMED:
+                {
+                    var opcodeString = Opcode.ToString().PadRight(OpcodeDefinition.LogestInstructionName);
+                    var immediateString = mImmediateValue.ToString((immedateFormatHex) ? "X4" : null);
+                    return $"{opcodeString} {mARegester},{mBRegester},{immediateString}";
+                }
+                default:
+                {
+                    throw new OpcodeInstanceException($"Unknown State {ArgumentType}!");
+                }
+            }
+        }
     }
 }

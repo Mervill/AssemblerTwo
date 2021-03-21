@@ -279,8 +279,8 @@ namespace AssemblerTwo.Cmd.VirtualTerminal
         {
             var currentWord = mMemoryBus.Read16(address);
 
-            RegisterName registerA;
-            RegisterName registerB;
+            RegisterName? registerA;
+            RegisterName? registerB;
             var opcodeDef = OpcodeDefinition.Decode(currentWord, out registerA, out registerB);
 
             if (opcodeDef != null)

@@ -332,6 +332,7 @@ namespace AssemblerTwo.Lib
             var labelRefs = new Dictionary<string, List<int>>();
             var relocationIndicies = new HashSet<int>(); // TODO
 
+            // calc totalBytes
             for (int x = 0; x < astNodes.Count; x++)
             {
                 var node = astNodes[x];
