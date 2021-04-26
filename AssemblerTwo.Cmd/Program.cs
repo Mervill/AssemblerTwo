@@ -209,8 +209,8 @@ namespace AssemblerTwo.Cmd
                         Console.WriteLine($"Writing {symbolTableFilename} ({symbolTableBytes.Length} bytes)...");
                         File.WriteAllBytes(symbolTableFilename, symbolTableBytes);
 
-                        //var symbolTable2 = SymbolTable.FromFile(symbolTableFilename);
-                        //Console.Write(symbolTable2.GetDump());
+                        var symbolTable2 = SymbolTable.FromFile(symbolTableFilename);
+                        Console.Write(symbolTable2.GetDump());
 
                         //bytes = BytecodeUtil.Relocate(byteGroup, 0x0002);
 

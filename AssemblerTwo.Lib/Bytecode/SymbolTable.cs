@@ -37,6 +37,8 @@ namespace AssemblerTwo.Lib
     //   List of label define site names (label names)
     //     - int16: string length
     //     - string: label name
+    // - int16 List Length
+    //   List of chunk hints for disassembly
 
     public class SymbolTable
     {
@@ -53,7 +55,7 @@ namespace AssemblerTwo.Lib
         public PublicSymbol[] PublicSymbols;
         public ushort[] ExtraDeltaAddresses;
         public string[] SymbolDefineNames;
-        //DataSectionHints
+        public ChunkInfo[] ChunkInfos;
 
         public string GetDump(bool padding = true)
         {
@@ -150,6 +152,15 @@ namespace AssemblerTwo.Lib
                             BinWrite16(memWriter, (ushort)lst.Length);
                             memWriter.Write(lst);
                         }
+
+                        BinWrite16(memWriter, (ushort)ChunkInfos.Length);
+                        for (int x = 0; x < ChunkInfos.Length; x++)
+                        {
+                            var chunkInfo = ChunkInfos[x];
+                            BinWrite16(memWriter, chunkInfo.Address);
+                            BinWrite16(memWriter, chunkInfo.Length);
+                            memWriter.Write((byte)chunkInfo.Type);
+                        }
                     }
                 }
                 return memStream.ToArray();
@@ -157,10 +168,10 @@ namespace AssemblerTwo.Lib
         }
 
         public static SymbolTable FromFile(string filename)
-        {
-            using (StreamReader streamReader = new StreamReader(filename))
+        {   
+            using (var fileStream = File.Open(filename, FileMode.Open))
             {
-                return FromStream(streamReader.BaseStream);
+                return FromStream(fileStream);
             }
         }
 
@@ -228,10 +239,24 @@ namespace AssemblerTwo.Lib
                     }
 
                     newSymbolTable.SymbolDefineNames = symbolDefineNames;
+
+                    var lenChunkInfos = BinRead16(binReader);
+                    var chunkInfos = new ChunkInfo[lenChunkInfos];
+                    for (int x = 0; x < chunkInfos.Length; x++)
+                    {
+                        var chunkAddress = BinRead16(binReader);
+                        var chunkLength = BinRead16(binReader);
+                        var chunkType = binReader.ReadByte();
+                        var chunkInfo = new ChunkInfo();
+                        chunkInfo.Address = chunkAddress;
+                        chunkInfo.Length = chunkLength;
+                        chunkInfo.Type = (ChunkType)chunkType;
+                    }
                 }
                 else
                 {
                     newSymbolTable.SymbolDefineNames = Array.Empty<string>();
+                    newSymbolTable.ChunkInfos = Array.Empty<ChunkInfo>();
                 }
 
                 return newSymbolTable;

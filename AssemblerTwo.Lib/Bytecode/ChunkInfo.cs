@@ -5,14 +5,17 @@ using System.Text;
 
 namespace AssemblerTwo.Lib
 {
-    public enum ChunkType
+    public enum ChunkType : byte
     {
-        Instruction,
+        Instructions,
         String,
         Binary,
     }
 
-    public class ChunkHint
+    public class ChunkInfo
     {
+        public ushort Address;
+        public ushort Length;
+        public ChunkType Type;
     }
 }

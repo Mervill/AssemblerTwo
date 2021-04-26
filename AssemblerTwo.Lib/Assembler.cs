@@ -327,12 +327,14 @@ namespace AssemblerTwo.Lib
 
         public static BytecodeGroup GenerateBytecode(List<ASTNode> astNodes, bool generateSymbolTable, bool symbolTableDebugMode)
         {
-            var totalBytes = 0;
+            ushort totalBytes = 0;
             var labelDefines = new Dictionary<string, int>();
             var labelRefs = new Dictionary<string, List<int>>();
             var relocationIndicies = new HashSet<int>(); // TODO
+            var chunkInfos = new List<ChunkInfo>();
 
-            // calc totalBytes
+            // calc totalBytes & build the ChunkInfos list
+            ChunkInfo currentInstructionChunk = null;
             for (int x = 0; x < astNodes.Count; x++)
             {
                 var node = astNodes[x];
@@ -346,17 +348,51 @@ namespace AssemblerTwo.Lib
                 {
                     case ASTNodeType.Binary:
                     {
+                        if (currentInstructionChunk != null)
+                        {
+                            ushort len = (ushort)(totalBytes - currentInstructionChunk.Address);
+                            currentInstructionChunk.Length = len;
+                            chunkInfos.Add(currentInstructionChunk);
+                            currentInstructionChunk = null;
+                        }
+
                         var astBinary = (ASTBinary)node;
-                        totalBytes += astBinary.Bytes.Length;
+
+                        var binaryChunkInfo = new ChunkInfo
+                        {
+                            Address = totalBytes,
+                            Length = (ushort)astBinary.Bytes.Length,
+                            Type = ChunkType.Binary,
+                        };
+                        chunkInfos.Add(binaryChunkInfo);
+
+                        totalBytes += binaryChunkInfo.Length;
+
                         break;
                     }
                     case ASTNodeType.Opcode:
                     {
+                        if (currentInstructionChunk == null)
+                        {
+                            currentInstructionChunk = new ChunkInfo()
+                            {
+                                Address = totalBytes,
+                                Length = 0,
+                                Type = ChunkType.Instructions,
+                            };
+                        }
                         var astOpcode = (ASTOpcode)node;
-                        totalBytes += astOpcode.GetDef().ByteLength;
+                        totalBytes += (ushort)astOpcode.GetDef().ByteLength;
                         break;
                     }
                 }
+            }
+
+            if (currentInstructionChunk != null)
+            {
+                ushort len = (ushort)(totalBytes - currentInstructionChunk.Address);
+                currentInstructionChunk.Length = len;
+                chunkInfos.Add(currentInstructionChunk);
             }
 
             var finalBytes = new byte[totalBytes];
@@ -485,7 +521,7 @@ namespace AssemblerTwo.Lib
             SymbolTable symbolTable = null;
             if (generateSymbolTable)
             {
-                symbolTable = GenerateSymbolTable(labelDefines, labelRefs, symbolTableDebugMode);
+                symbolTable = GenerateSymbolTable(symbolTableDebugMode, labelDefines, labelRefs, chunkInfos);
             }
 
             return new BytecodeGroup
@@ -498,9 +534,11 @@ namespace AssemblerTwo.Lib
             };
         }
 
-        private static SymbolTable GenerateSymbolTable(Dictionary<string, int> labelDefines, Dictionary<string, List<int>> labelRefs, bool preserveNames)
+        private static SymbolTable GenerateSymbolTable(bool isDebugTable, Dictionary<string, int> labelDefines, Dictionary<string, List<int>> labelRefs, List<ChunkInfo> chunkInfos)
         {
             var newSymbolTable = new SymbolTable();
+
+            var flag = (isDebugTable) ? SymbolTable.DebugFlag : SymbolTable.ReleaseFlag;
 
             var labelDefinePairs = labelDefines.ToArray();
             var labelReferencePairs = labelRefs.ToArray();
@@ -510,7 +548,7 @@ namespace AssemblerTwo.Lib
             {
                 symbolDefineAddresses[x] = (ushort)labelDefinePairs[x].Value;
             }
-
+            
             ushort[][] nonExternalReferenceAddresses = new ushort[labelReferencePairs.Length][];
             for (int x = 0; x < labelReferencePairs.Length; x++)
             {
@@ -527,7 +565,7 @@ namespace AssemblerTwo.Lib
             }
 
             string[] symbolDefineNames = Array.Empty<string>();
-            if (preserveNames)
+            if (isDebugTable)
             {
                 symbolDefineNames = new string[labelDefinePairs.Length];
                 for (int x = 0; x < labelDefinePairs.Length; x++)
@@ -535,8 +573,6 @@ namespace AssemblerTwo.Lib
                     symbolDefineNames[x] = labelDefinePairs[x].Key;
                 }
             }
-
-            var flag = (preserveNames) ? SymbolTable.DebugFlag : SymbolTable.ReleaseFlag;
 
             return new SymbolTable
             {
@@ -547,6 +583,7 @@ namespace AssemblerTwo.Lib
                 PublicSymbols = Array.Empty<PublicSymbol>(),
                 ExtraDeltaAddresses = Array.Empty<ushort>(),
                 SymbolDefineNames = symbolDefineNames,
+                ChunkInfos = (isDebugTable) ? chunkInfos.ToArray() : Array.Empty<ChunkInfo>(),
             };
         }
 
