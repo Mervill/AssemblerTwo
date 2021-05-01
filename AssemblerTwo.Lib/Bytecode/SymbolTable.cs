@@ -148,7 +148,7 @@ namespace AssemblerTwo.Lib
                         for (int x = 0; x < SymbolDefineNames.Length; x++)
                         {
                             var symbolName = SymbolDefineNames[x];
-                            var lst = Assembler.TxtEncoding.GetBytes(symbolName);
+                            var lst = StaticAssembler.TxtEncoding.GetBytes(symbolName);
                             BinWrite16(memWriter, (ushort)lst.Length);
                             memWriter.Write(lst);
                         }
@@ -235,7 +235,7 @@ namespace AssemblerTwo.Lib
                     {
                         var stringLength = BinRead16(binReader);
                         var lst = binReader.ReadBytes(stringLength);
-                        symbolDefineNames[x] = Assembler.TxtEncoding.GetString(lst);
+                        symbolDefineNames[x] = StaticAssembler.TxtEncoding.GetString(lst);
                     }
 
                     newSymbolTable.SymbolDefineNames = symbolDefineNames;

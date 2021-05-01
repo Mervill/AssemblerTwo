@@ -53,7 +53,7 @@ namespace AssemblerTwo.Cmd.VirtualTerminal
         public void LoadSource(string filename, int memoryOffset)
         {
             var sourceText = File.ReadAllText(filename);
-            var buildResult = Assembler.Build(sourceText);
+            var buildResult = StaticAssembler.Build(sourceText);
             if (buildResult.FinalBytes != null)
             {
                 mMemoryBus.CopyInto(buildResult.FinalBytes.Bytes, memoryOffset);

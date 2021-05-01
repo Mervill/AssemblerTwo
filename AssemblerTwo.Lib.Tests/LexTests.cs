@@ -14,7 +14,7 @@ namespace AssemblerTwo.Lib.Tests
         [Test, TestCaseSource(nameof(DoesntAcceptNullOrEmptyCases))]
         public static void DoesntAcceptNullOrEmpty(List<StringTokenInfo> sourceTokens)
         {
-            Assert.Throws<ArgumentException>(() => Assembler.Lex(sourceTokens));
+            Assert.Throws<ArgumentException>(() => StaticAssembler.Lex(sourceTokens));
         }
 
         public static System.Collections.IEnumerable DoesntAcceptNullOrEmptyCases()
@@ -31,7 +31,7 @@ namespace AssemblerTwo.Lib.Tests
             var stringToken = new StringTokenInfo(StringToken.Unknown, string.Empty);
             var stringTokenList = new List<StringTokenInfo>();
             stringTokenList.Add(stringToken);
-            Assert.Throws<AssemblerException>(() => Assembler.Lex(stringTokenList));
+            Assert.Throws<AssemblerException>(() => StaticAssembler.Lex(stringTokenList));
         }
 
         public static void SimpleLexTest()

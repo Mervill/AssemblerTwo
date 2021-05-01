@@ -18,6 +18,9 @@
     <Content Include="..\Documents\Sources\printhex.asm2.txt" Link="Sources\printhex.asm2.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="..\Documents\Sources\scratch.asm2.txt" Link="Sources\scratch.asm2.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="..\Documents\Sources\test.asm2.txt" Link="Sources\test.asm2.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

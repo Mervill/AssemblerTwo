@@ -329,7 +329,7 @@ namespace AssemblerTwo.Lib
                             // Use ascii encoding for now, but we should actually use 'no encoding'
                             // http://stackoverflow.com/questions/472906
                             var unescape = System.Text.RegularExpressions.Regex.Unescape(putStringToken.Value);
-                            var lst = Assembler.TxtEncoding.GetBytes(unescape).ToList();
+                            var lst = StaticAssembler.TxtEncoding.GetBytes(unescape).ToList();
                             //lst.Add(0);
                             astBinary.Bytes = lst.ToArray();
 

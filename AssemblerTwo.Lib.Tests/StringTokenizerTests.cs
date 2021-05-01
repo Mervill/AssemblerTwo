@@ -15,7 +15,7 @@ namespace AssemblerTwo.Lib.Tests
         [TestCase("")]
         public static void NullOrEmptySourceText(string sourceText)
         {
-            Assert.Throws<ArgumentException>(() => Assembler.StringTokenize(sourceText));
+            Assert.Throws<ArgumentException>(() => StaticAssembler.StringTokenize(sourceText));
         }
 
         /*
@@ -86,7 +86,7 @@ namespace AssemblerTwo.Lib.Tests
         {
             var sourceText = File.ReadAllText(sourceTextPath);
             var sourceTextLines = sourceText.Split(new[] { "\r\n", "\n" }, StringSplitOptions.None);
-            var stringTokenList = Assembler.StringTokenize(sourceText);
+            var stringTokenList = StaticAssembler.StringTokenize(sourceText);
             var globalCharacterIndex = 0;
             var nextEndOfLineIndex = 0;
             for (int x = 0; x < stringTokenList.Count; x++)
@@ -139,7 +139,7 @@ namespace AssemblerTwo.Lib.Tests
             var sourceText = File.ReadAllText(sourceTextPath);
             string expectedDumpText = File.ReadAllText(expectedDumpPath);
 
-            var stringTokenList = Assembler.StringTokenize(sourceText);
+            var stringTokenList = StaticAssembler.StringTokenize(sourceText);
             var stringTokenDump = DumpUtility.DumpStringTokens(stringTokenList, showIndices: false);
             Assert.AreEqual(expectedDumpText, stringTokenDump);
         }
@@ -163,7 +163,7 @@ namespace AssemblerTwo.Lib.Tests
             // Note: Test reqires a file with at least one line ending
             var sourceText = File.ReadAllText(sourceTextPath);
             var sourceTextLines = sourceText.Split(new[] { "\r\n", "\n" }, StringSplitOptions.None);
-            var stringTokenList = Assembler.StringTokenize(sourceText);
+            var stringTokenList = StaticAssembler.StringTokenize(sourceText);
             //var fileIsWindowsLineEndings = (stringTokenList.First(x => x.Token == StringToken.EndOfLine).Value == "\r\n");
             var roundTripSourceText = new StringBuilder();
             var globalCharacterIndex = 0;

@@ -60,7 +60,7 @@ namespace AssemblerTwo.Cmd
                         foreach (string filePath in Directory.GetFiles(o.Filename, "*.input.txt"))
                         {
                             var sourceText = File.ReadAllText(filePath);
-                            var stringTokens = Assembler.StringTokenize(sourceText);
+                            var stringTokens = StaticAssembler.StringTokenize(sourceText);
                             var dumpText = DumpUtility.DumpStringTokens(stringTokens, showIndices: false);
                             var outputPath = filePath.Replace(".input.txt", ".output.txt");
                             File.WriteAllText(outputPath, dumpText);
@@ -84,7 +84,7 @@ namespace AssemblerTwo.Cmd
                     {
                         var sourceText = File.ReadAllText(o.Filename);
                         Console.WriteLine($"File: {o.Filename} ({Encoding.UTF8.GetByteCount(sourceText)} bytes)");
-                        var stringTokens = Assembler.StringTokenize(sourceText);
+                        var stringTokens = StaticAssembler.StringTokenize(sourceText);
                         var dumpText = DumpUtility.DumpStringTokens(stringTokens, hideEoLCharacters: false);
                         Console.Write(dumpText);
                         string outFilename = "./dump-tokenize.output.txt";
@@ -96,8 +96,8 @@ namespace AssemblerTwo.Cmd
                     {
                         var sourceText = File.ReadAllText(o.Filename);
                         Console.WriteLine($"File: {o.Filename} ({Encoding.UTF8.GetByteCount(sourceText)} bytes)");
-                        var stringTokens = Assembler.StringTokenize(sourceText);
-                        var lexTokens = Assembler.Lex(stringTokens);
+                        var stringTokens = StaticAssembler.StringTokenize(sourceText);
+                        var lexTokens = StaticAssembler.Lex(stringTokens);
                         var parseResult = Parser.Parse(lexTokens);
                         var dumpText = DumpUtility.DumpASTNodes(parseResult.SyntaxTree, true, true);
                         Console.Write(dumpText);
@@ -122,7 +122,7 @@ namespace AssemblerTwo.Cmd
                         var sourceText = File.ReadAllText(o.Filename);
                         Console.WriteLine($"File: {o.Filename}");
 
-                        var buildResult = Assembler.Build(sourceText);
+                        var buildResult = StaticAssembler.Build(sourceText);
                         var bytes = buildResult.FinalBytes?.Bytes;
                         if (bytes != null)
                         {
@@ -163,31 +163,16 @@ namespace AssemblerTwo.Cmd
 
                         var sourceText = File.ReadAllText(o.Filename);
                         Console.WriteLine($"File: {o.Filename} ({Encoding.UTF8.GetByteCount(sourceText)} bytes)");
-
-                        Console.WriteLine("StringTokenize...");
-                        var stringTokens = Assembler.StringTokenize(sourceText);
-
-                        //Console.WriteLine("DumpStringTokens:");
-                        //Console.WriteLine(DumpUtility.DumpStringTokens(stringTokens, hideEoLCharacters: false, csvFormat: false));
-
-                        Console.WriteLine($"Got {stringTokens.Count} string tokens");
-
-                        Console.WriteLine("Lex...");
-                        var lexTokens = Assembler.Lex(stringTokens);
-
-                        Console.WriteLine("Parse...");
-                        var parseResult = Parser.Parse(lexTokens);
-
-                        if (parseResult.NameDirectiveToken != null)
+                        
+                        AssemblerBuildResult asmResult = null;
+                        using (var consoleWriter = new StreamWriter(Console.OpenStandardOutput(), null, -1, true))
                         {
-                            Console.WriteLine($"AST Name: {parseResult.NameDirectiveToken.Value}");
+                            var asm = new Assembler(consoleWriter);
+                            asm.MaxLogLevel = Assembler.LogLevel.Info;
+                            asmResult = asm.Build(sourceText);
                         }
-                        
-                        Console.WriteLine("AST Nodes:");
-                        Console.Write(DumpUtility.DumpASTNodes(parseResult.SyntaxTree, true, true));
-                        
-                        Console.WriteLine("GenerateBytecode...");
-                        var byteGroup = Assembler.GenerateBytecode(parseResult.SyntaxTree, true, true);
+
+                        var byteGroup = asmResult.FinalBytes;
 
                         Console.WriteLine("Bytecode:");
                         var finalBytes = byteGroup.Bytes;
