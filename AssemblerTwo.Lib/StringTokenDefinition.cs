@@ -25,15 +25,15 @@ namespace AssemblerTwo.Lib
         {
             // What could still go here?
             // SignedNumber vs UnsignedNumber (maayyybeee)
-            new (StringToken.EndOfLine , "^\r?\n"),
-            new (StringToken.Whitespace, "^[ \t]+"),
-            new (StringToken.Comment   , "^;[^\r\n]*"),
-            new (StringToken.String    , "^\"[^\r\n]*?\""), // TODO: double quote escaped inside string
-            //new (StringToken.Symbol    , "^[\\+\\-/*><=,:]"),
-            new (StringToken.Symbol    , "^[`~!@#$%^&*()\\-+{}\\[\\]|\\:',.<>/?]"), // excluding _;"
-            new (StringToken.HexNumber , "^0x([0-9A-F]+)"),
-            new (StringToken.Number    , "^[0-9]+"),
-            new (StringToken.Identifier, "^[A-Z_][A-Z0-9_]*"),
+            new StringTokenDefinition(StringToken.EndOfLine , "^\r?\n"),
+            new StringTokenDefinition(StringToken.Whitespace, "^[ \t]+"),
+            new StringTokenDefinition(StringToken.Comment   , "^;[^\r\n]*"),
+            new StringTokenDefinition(StringToken.String    , "^\"[^\r\n]*?\""), // TODO: double quote escaped inside string
+            //new StringTokenDefinition(StringToken.Symbol    , "^[\\+\\-/*><=,:]"),
+            new StringTokenDefinition(StringToken.Symbol    , "^[`~!@#$%^&*()\\-+{}\\[\\]|\\:',.<>/?]"), // excluding _;"
+            new StringTokenDefinition(StringToken.HexNumber , "^0x([0-9A-F]+)"),
+            new StringTokenDefinition(StringToken.Number    , "^[0-9]+"),
+            new StringTokenDefinition(StringToken.Identifier, "^[A-Z_][A-Z0-9_]*"),
         };
 
         private readonly StringToken mToken;

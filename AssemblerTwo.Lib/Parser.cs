@@ -17,7 +17,7 @@ namespace AssemblerTwo.Lib
             var partialResult = new ParseResult();
 
             // shallow copy
-            lexicalTokens = new(lexicalTokens);
+            lexicalTokens = new List<LexicalTokenInfo>(lexicalTokens);
 
             LToken<string> unanchoredLabel = null;
             Dictionary<string, LToken<string>> identsDefined = new Dictionary<string, LToken<string>>();

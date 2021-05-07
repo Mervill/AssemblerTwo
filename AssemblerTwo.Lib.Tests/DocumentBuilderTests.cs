@@ -19,7 +19,12 @@ namespace AssemblerTwo.Lib.Tests
         public static void GeneratesCorrectBytes(Opcode opcode, RegisterName? regA, RegisterName? regB, int? immed, int[] expectedBytes)
         {
             var documentBuilder = new DocumentBuilder();
-            ushort? immedShort = immed.HasValue ? (ushort)immed.Value : null;
+            //ushort? immedShort = immed.HasValue ? (ushort)immed.Value : null;
+            ushort? immedShort = null;
+            if (immed.HasValue)
+            {
+                immedShort = (ushort)immed.Value;
+            }
             documentBuilder.Append(opcode, regA, regB, immedShort);
             var resultBytes = documentBuilder.GetBytes();
             var expectedBytesList = expectedBytes.SelectMany(x => BitConverter.GetBytes((UInt16)x).Reverse()).ToArray();
