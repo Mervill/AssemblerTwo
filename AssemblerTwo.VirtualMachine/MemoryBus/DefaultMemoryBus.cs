@@ -12,12 +12,12 @@ namespace AssemblerTwo.Machine
         {
         }
 
-        public virtual byte MachineRead(int address)
+        public virtual byte MemoryBusRead(int address)
         {
             return mMemory[address & 0xFFFF];
         }
 
-        public virtual void MachineWrite(int address, byte value)
+        public virtual void MemoryBusWrite(int address, byte value)
         {
             mMemory[address & 0xFFFF] = value;
         }

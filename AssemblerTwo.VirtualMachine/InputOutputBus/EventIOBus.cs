@@ -14,12 +14,12 @@ namespace AssemblerTwo.Machine
         public OnMachineReadInputDelegate OnMachineReadInput { get; set; }
         public OnMachineWriteOutputDelegate OnMachineWriteOutput { get; set; }
 
-        public int MachineReadInput(int portNumber)
+        public int IOBusRead(int portNumber)
         {
             return OnMachineReadInput?.Invoke(portNumber) ?? 0;
         }
 
-        public void MachineWriteOutput(int portNumber, int value)
+        public void IOBusWrite(int portNumber, int value)
         {
             OnMachineWriteOutput?.Invoke(portNumber, value);
         }

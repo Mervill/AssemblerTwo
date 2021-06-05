@@ -4,7 +4,7 @@ namespace AssemblerTwo.Machine
 {
     public interface IInputOutputBus
     {
-        public int MachineReadInput(int portNumber);
-        public void MachineWriteOutput(int portNumber, int value);
+        public int IOBusRead(int portNumber);
+        public void IOBusWrite(int portNumber, int value);
     }
 }

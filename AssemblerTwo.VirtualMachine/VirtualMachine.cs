@@ -4,6 +4,9 @@ namespace AssemblerTwo.Machine
 {
     public class VirtualMachine
     {
+        public const int WORD_LENGTH   = 16;
+        public const int WORD_MAXVALUE = 0xFFFF;
+
         IMemoryBus mMemoryBus;
         IInputOutputBus mInputOutputBus;
 
@@ -15,7 +18,7 @@ namespace AssemblerTwo.Machine
             get { return Registers[0xF];  }
             set { Registers[0xF] = value; }
         }
-        public bool IsHalted { get; set; }
+        public bool IsHalted { get; private set; }
         public bool CanInterrupt { get; private set; }
         public bool PendingInterrupt { get; private set; }
         public int PendingInterruptVector { get; private set; }
@@ -28,32 +31,32 @@ namespace AssemblerTwo.Machine
 
         int MemoryRead(int address)
         {
-            return (mMemoryBus.MachineRead(address) << 8) | mMemoryBus.MachineRead(address + 1);
+            return (mMemoryBus.MemoryBusRead(address) << 8) | mMemoryBus.MemoryBusRead(address + 1);
         }
 
         void MemoryWrite(int address, int value)
         {
-            mMemoryBus.MachineWrite(address, (byte)(value >> 8));
-            mMemoryBus.MachineWrite(address + 1, (byte)(value & 0xFF));
+            mMemoryBus.MemoryBusWrite(address, (byte)(value >> 8));
+            mMemoryBus.MemoryBusWrite(address + 1, (byte)(value & 0xFF));
         }
 
         int StackPop()
         {
             var top = MemoryRead(StackPointer);
-            StackPointer = (StackPointer + 2) & 0xFFFF;
+            StackPointer = (StackPointer + 2) & WORD_MAXVALUE;
             return top;
         }
 
         void StackPush(int value)
         {
-            StackPointer = (StackPointer - 2) & 0xFFFF;
+            StackPointer = (StackPointer - 2) & WORD_MAXVALUE;
             MemoryWrite(StackPointer, value);
         }
 
         int FetchAndAdvance()
         {
             var value = MemoryRead(ProgramCounter);
-            ProgramCounter = (ProgramCounter + 2) & 0xFFFF;
+            ProgramCounter = (ProgramCounter + 2) & WORD_MAXVALUE;
             return value;
         }
 
@@ -70,39 +73,42 @@ namespace AssemblerTwo.Machine
 
         public bool RequestInterrupt(int vector)
         {
-            if (!IsHalted)
+            if (CanInterrupt)
             {
-                if (CanInterrupt)
-                {
-                    PendingInterruptVector = vector & 0xFFFF;
-                    PendingInterrupt = true;
-                }
-                return PendingInterrupt;
+                PendingInterruptVector = vector & WORD_MAXVALUE;
+                PendingInterrupt = true;
             }
-            else
+            return PendingInterrupt;
+        }
+
+        public void ClearPendingInterrupt()
+        {
+            if (PendingInterrupt)
             {
-                return false;
+                PendingInterrupt = false;
+                PendingInterruptVector = 0;
             }
         }
 
         public int StepInstruction()
         {
+            if (CanInterrupt && PendingInterrupt)
+            {
+                var currentInterruptVector = PendingInterruptVector;
+                CanInterrupt = false;
+                PendingInterrupt = false;
+                PendingInterruptVector = 0;
+                IsHalted = false;
+                return DoInstruction(currentInterruptVector);
+            }
+
             if (!IsHalted)
             {
-                if (PendingInterrupt) // && CanInterrupt?
-                {
-                    int result = DoInstruction(PendingInterruptVector);
-                    PendingInterrupt = false;
-                    PendingInterruptVector = 0;
-                    return result;
-                }
                 var next_instruction = FetchAndAdvance();
                 return DoInstruction(next_instruction);
             }
-            else
-            {
-                return 0;
-            }
+
+            return 0;
         }
 
         int DoInstruction(int opcode)
@@ -542,7 +548,7 @@ namespace AssemblerTwo.Machine
                         case 0xD:
                         {
                             // IN
-                            Registers[regA] = mInputOutputBus.MachineReadInput(Registers[regB]);
+                            Registers[regA] = mInputOutputBus.IOBusRead(Registers[regB]);
                             return 1;
                         }
                     }
@@ -568,13 +574,13 @@ namespace AssemblerTwo.Machine
                         {
                             // INI
                             int portNumber = FetchAndAdvance();
-                            Registers[valu] = mInputOutputBus.MachineReadInput(portNumber);
+                            Registers[valu] = mInputOutputBus.IOBusRead(portNumber);
                             return 2;
                         }
                         case 0x4: // OUTI
                         {
                             int portNumber = FetchAndAdvance();
-                            mInputOutputBus.MachineWriteOutput(portNumber, Registers[valu]);
+                            mInputOutputBus.IOBusWrite(portNumber, Registers[valu]);
                             return 2;
                         }
                         case 0x5: // Unallocated - SHAL
@@ -626,6 +632,7 @@ namespace AssemblerTwo.Machine
                                 case 0xD:
                                 {
                                     // HALT
+                                    //ProgramCounter = (ProgramCounter - 1) & 0xffff;
                                     IsHalted = true;
                                     return 1;
                                 }
@@ -683,7 +690,7 @@ namespace AssemblerTwo.Machine
                     // OUT
                     int regA = (opcode & 0x00F0) >> 4;
                     int regB = (opcode & 0x000F);
-                    mInputOutputBus.MachineWriteOutput(Registers[regA], Registers[regB]);
+                    mInputOutputBus.IOBusWrite(Registers[regA], Registers[regB]);
                     return 1;
                 }
             }

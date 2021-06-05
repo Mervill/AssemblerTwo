@@ -4,7 +4,7 @@ namespace AssemblerTwo.Machine
 {
     public interface IMemoryBus
     {
-        public byte MachineRead(int address);
-        public void MachineWrite(int address, byte value);
+        public byte MemoryBusRead(int address);
+        public void MemoryBusWrite(int address, byte value);
     }
 }

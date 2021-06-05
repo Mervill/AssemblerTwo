@@ -2,13 +2,14 @@
 using System.IO;
 using System.Linq;
 using System.Collections.Generic;
+using System.Text;
 
 using CommandLine;
 
 using AssemblerTwo.Cmd.VirtualTerminal;
 using AssemblerTwo.Lib;
 using AssemblerTwo.Machine;
-using System.Text;
+using AssemblerTwo.Machine.IOBusBridge;
 
 using Parser = AssemblerTwo.Lib.Parser;
 using CmdParser = CommandLine.Parser;
@@ -168,7 +169,7 @@ namespace AssemblerTwo.Cmd
                         using (var consoleWriter = new StreamWriter(Console.OpenStandardOutput(), null, -1, true))
                         {
                             var asm = new Assembler(consoleWriter);
-                            asm.MaxLogLevel = Assembler.LogLevel.Info;
+                            asm.MaxLogLevel = Assembler.LogLevel.Error;
                             asmResult = asm.Build(sourceText);
                         }
 
@@ -203,7 +204,8 @@ namespace AssemblerTwo.Cmd
                         File.WriteAllBytes(o.Output, finalBytes);
 
                         Console.WriteLine();
-
+                        
+                        /*
                         var sb = new StringBuilder();
                         var doc = new DocumentBuilder();
                         var byteIndex = 0;
@@ -264,6 +266,7 @@ namespace AssemblerTwo.Cmd
                         }
 
                         Console.WriteLine(sb.ToString());
+                        */
 
                         Console.WriteLine("Process complete!");
 
@@ -309,7 +312,9 @@ namespace AssemblerTwo.Cmd
             var memBus = new DefaultMemoryBus();
             memBus.CopyInto(bytes, baseAddress);
 
-            var ioBus = new DefaultIOBus(Console.Write);
+            //var ioBus = new DefaultIOBus(Console.Write);
+            var ioBus = new DefaultIOBusBridge(true, DefaultIOBusBridge.UnconnectedPortBehaviour.Excep);
+            ioBus.Connect(new ConsoleBusDevice());
 
             var vm = new VirtualMachine(memBus, ioBus);
             vm.ProgramCounter = baseAddress;

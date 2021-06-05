@@ -170,7 +170,7 @@ namespace AssemblerTwo.Lib
                 {
                     finalMessage = string.Format("[{0}] {1}", logLevel, message);
                 }
-                mLogWriter.WriteLine(finalMessage);
+                mLogWriter?.WriteLine(finalMessage);
             }
         }
 
@@ -178,7 +178,7 @@ namespace AssemblerTwo.Lib
         {
             if (IsLogLevel(logLevel))
             {
-                mLogWriter.Write(message);
+                mLogWriter?.Write(message);
             }
         }
 

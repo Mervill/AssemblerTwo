@@ -349,12 +349,12 @@ namespace AssemblerTwo.Cmd.VirtualTerminal
                 .Replace('1', '■');
         }
 
-        public int MachineReadInput(int portNumber)
+        public int IOBusRead(int portNumber)
         {
             throw new NotImplementedException();
         }
 
-        public void MachineWriteOutput(int portNumber, int value)
+        public void IOBusWrite(int portNumber, int value)
         {
             switch (portNumber)
             {

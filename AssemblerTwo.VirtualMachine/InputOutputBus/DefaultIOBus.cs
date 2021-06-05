@@ -15,19 +15,19 @@ namespace AssemblerTwo.Machine
             mWriterAction = writerAction;
         }
 
-        public override int MachineReadInput(int portNumber)
+        public override int IOBusRead(int portNumber)
         {
-            return base.MachineReadInput(portNumber);
+            return base.IOBusRead(portNumber);
         }
 
-        public override void MachineWriteOutput(int portNumber, int value)
+        public override void IOBusWrite(int portNumber, int value)
         {
             if (portNumber == mWriterPortCode)
             {
                 var character = Convert.ToChar(value & 0xFF);
                 mWriterAction(new string(character, 1));
             }
-            base.MachineWriteOutput(portNumber, value);
+            base.IOBusWrite(portNumber, value);
         }
     }
 }

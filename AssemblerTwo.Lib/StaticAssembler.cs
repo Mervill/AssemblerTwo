@@ -11,7 +11,7 @@ namespace AssemblerTwo.Lib
     {
         // stream: read in chunks up to next \n or eof
         // do we even want to care about stream reading / char walking if we want
-        // to do things like error printing? probablly since streams are about
+        // to do things like error printing? probably since streams are about
         // doing the processing inline with the file reading itself rather then waiting
         // for the whole file to become loaded into memory. we want the whole file in memory anyway
         // but streams are fancy and we can hold the data in something other then a single string variable
